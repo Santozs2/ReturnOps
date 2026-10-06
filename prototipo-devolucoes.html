@@ -1,0 +1,3177 @@
+<title>Recupera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  /* Recupera. Layout: app shell (sidebar on desktop, bottom tab bar with a raised "Receber" on phone); one vocabulary of stages shared by stepper, tiles, chips and pills */
+  /* Light-first: opens light even on dark phones (bright warehouse/office); an explicit dark choice in the viewer still applies */
+  :root {
+    --bg: #EFF3F4;
+    --surface: #FFFFFF;
+    --surface-2: #F5F8F9;
+    --ink: #152328;
+    --muted: #55666D;
+    --line: #D6E0E3;
+    --accent: #0E5A6B;
+    --accent-soft: #DCEEF2;
+    --accent-ink: #FFFFFF;
+    --ok: #23744A;
+    --ok-soft: #E0F0E6;
+    --warn: #8F5F00;
+    --warn-soft: #FAEFD4;
+    --bad: #B32317;
+    --bad-soft: #FAE3E0;
+    --info: #4D5E69;
+    --info-soft: #E5EAEE;
+    --p-ml: #eda100;
+    --p-sh: #eb6834;
+    --p-tt: #1baf7a;
+    --p-lj: #2a78d6;
+    --scan: #0C1417;
+    --scan-line: #37C3D6;
+    --f-display: "Archivo", "Arial Narrow", Arial, sans-serif;
+    --f-body: "IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif;
+    --f-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0D1417;
+    --surface: #152025;
+    --surface-2: #1A262C;
+    --ink: #E2EBEE;
+    --muted: #92A3AB;
+    --line: #263741;
+    --accent: #4DB5C7;
+    --accent-soft: #11313A;
+    --accent-ink: #0A1417;
+    --ok: #5CC387;
+    --ok-soft: #17301F;
+    --warn: #E5B04E;
+    --warn-soft: #33290F;
+    --bad: #FF7A6B;
+    --bad-soft: #3A1A17;
+    --info: #A8B6C1;
+    --info-soft: #222D35;
+    --p-ml: #c98500;
+    --p-sh: #d95926;
+    --p-tt: #199e70;
+    --p-lj: #3987e5;
+    color-scheme: dark;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.5 var(--f-body);
+    margin: 0;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  h1 {
+    font-family: var(--f-display);
+    font-weight: 800;
+    font-stretch: 82%;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    line-height: 1.1;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-stretch: 90%;
+    font-size: 1.1rem;
+    line-height: 1.2;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .ic {
+    width: 18px;
+    height: 18px;
+    flex: none;
+  }
+
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: .72rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 4px;
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+
+  .sub {
+    display: block;
+    color: var(--muted);
+    font-size: .84rem;
+  }
+
+  .hint {
+    font-size: .84rem;
+    color: var(--muted);
+  }
+
+  .mono {
+    font-family: var(--f-mono);
+    font-size: .88em;
+  }
+
+  .vh {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* Demo strip */
+  .demo-strip {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    background: var(--ink);
+    color: var(--bg);
+    font-size: .76rem;
+    padding: 5px 16px;
+    white-space: nowrap;
+  }
+
+  .demo-strip span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .demo-strip button {
+    flex: none;
+    background: none;
+    border: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    padding: 0 2px;
+    cursor: pointer;
+    color: inherit;
+    font-size: .76rem;
+  }
+
+  /* Shell */
+  .app {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    min-height: calc(100vh - 28px);
+  }
+
+  .side {
+    border-right: 1px solid var(--line);
+    background: var(--surface);
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    align-self: start;
+  }
+
+  .brand {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-family: var(--f-display);
+    font-weight: 800;
+    font-stretch: 85%;
+    font-size: 1.08rem;
+    line-height: 1.1;
+    padding: 4px 6px;
+  }
+
+  .brand .ic {
+    width: 34px;
+    height: 34px;
+    padding: 6px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .brand small {
+    display: block;
+    font: 500 .74rem var(--f-body);
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 0;
+  }
+
+  .mtop {
+    display: none;
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .nav button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 11px 10px;
+    border: 0;
+    background: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--muted);
+    text-align: left;
+  }
+
+  .nav button:hover {
+    color: var(--ink);
+    background: var(--surface-2);
+  }
+
+  .nav button.on {
+    color: var(--ink);
+    background: var(--accent-soft);
+  }
+
+  .badge {
+    margin-left: auto;
+    font: 600 .72rem var(--f-mono);
+    background: var(--bad);
+    color: var(--surface);
+    border-radius: 999px;
+    padding: 1px 7px;
+  }
+
+  .badge.neutral {
+    background: var(--surface-2);
+    color: var(--muted);
+    border: 1px solid var(--line);
+  }
+
+  .side-foot {
+    margin-top: auto;
+    font-size: .76rem;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  main {
+    padding: 28px 32px 56px;
+    min-width: 0;
+  }
+
+  .view {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .tabbar {
+    display: none;
+  }
+
+  /* Generic */
+  .page-h {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 20px;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .page-h>div {
+    min-width: 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .card-h {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 44px;
+    text-align: center;
+  }
+
+  .btn:hover {
+    border-color: var(--ink);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .btn-primary:hover {
+    border-color: var(--accent);
+    filter: brightness(1.07);
+  }
+
+  .btn.on {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .btn:disabled {
+    opacity: .65;
+    cursor: progress;
+  }
+
+  .btn-lg {
+    min-height: 54px;
+    font-size: 1.04rem;
+    padding: 10px 20px;
+  }
+
+  .w100 {
+    width: 100%;
+  }
+
+  .btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .linkbtn {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--accent);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: .78rem;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+
+  .pill-muted {
+    background: var(--surface-2);
+    color: var(--muted);
+    border-color: var(--line);
+  }
+
+  .pill-info {
+    background: var(--info-soft);
+    color: var(--info);
+  }
+
+  .pill-warn {
+    background: var(--warn-soft);
+    color: var(--warn);
+  }
+
+  .pill-accent {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .pill-ink {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .pill-ok {
+    background: var(--ok-soft);
+    color: var(--ok);
+  }
+
+  .pill-bad {
+    background: var(--bad-soft);
+    color: var(--bad);
+  }
+
+  .plat {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .86rem;
+    white-space: nowrap;
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    flex: none;
+  }
+
+  .p-ml {
+    background: var(--p-ml);
+  }
+
+  .p-sh {
+    background: var(--p-sh);
+  }
+
+  .p-tt {
+    background: var(--p-tt);
+  }
+
+  .p-lj {
+    background: var(--p-lj);
+  }
+
+  input[type="search"],
+  input[type="text"],
+  select,
+  textarea {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 9px 12px;
+    min-height: 46px;
+    font-size: 1rem;
+  }
+
+  textarea {
+    width: 100%;
+    resize: vertical;
+  }
+
+  /* Guide (demo) */
+  details.guide {
+    border: 1.5px dashed var(--accent);
+    background: var(--surface);
+    border-radius: 10px;
+  }
+
+  details.guide>summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+  }
+
+  details.guide>summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details.guide>summary::after {
+    content: "Mostrar";
+    margin-left: auto;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  details.guide[open]>summary::after {
+    content: "Esconder";
+  }
+
+  .prog {
+    width: 90px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    flex: none;
+  }
+
+  .prog i {
+    display: block;
+    height: 100%;
+    background: var(--ok);
+  }
+
+  .guide ol {
+    margin: 0;
+    padding: 0 16px 16px;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .gstep {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    text-align: left;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface-2);
+    cursor: pointer;
+    font-size: .88rem;
+  }
+
+  .gstep:hover {
+    border-color: var(--accent);
+  }
+
+  .gnum {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid var(--muted);
+    display: grid;
+    place-items: center;
+    font: 600 .75rem var(--f-mono);
+    color: var(--muted);
+  }
+
+  .gstep.done {
+    color: var(--muted);
+  }
+
+  .gstep.done .gnum {
+    background: var(--ok);
+    border-color: var(--ok);
+    color: var(--surface);
+  }
+
+  /* Painel: platform summary */
+  .sum3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .sum {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
+    text-align: left;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface-2);
+    cursor: pointer;
+    min-width: 0;
+  }
+
+  .sum:hover {
+    border-color: var(--ink);
+  }
+
+  .sum-n {
+    font-family: var(--f-display);
+    font-weight: 800;
+    font-size: 2.1rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sum-l {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  .sum.ok .sum-n {
+    color: var(--ok);
+  }
+
+  .sum.bad .sum-n {
+    color: var(--bad);
+  }
+
+  /* Painel: tasks */
+  .tgroups {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .tgroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .tg-h {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .tg-ic {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+  }
+
+  .tg-ic .ic {
+    width: 20px;
+    height: 20px;
+  }
+
+  .tone-bad {
+    background: var(--bad-soft);
+    color: var(--bad);
+  }
+
+  .tone-warn {
+    background: var(--warn-soft);
+    color: var(--warn);
+  }
+
+  .tone-info {
+    background: var(--info-soft);
+    color: var(--info);
+  }
+
+  .tone-ok {
+    background: var(--ok-soft);
+    color: var(--ok);
+  }
+
+  .tg-n {
+    font-family: var(--f-display);
+    font-weight: 800;
+    font-size: 1.5rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tlist {
+    list-style: none;
+    margin: 0 0 0 48px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .trow {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border: 0;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .tlist li:first-child .trow {
+    border-top: 0;
+  }
+
+  .trow:hover {
+    background: var(--surface-2);
+  }
+
+  .trow b {
+    font-weight: 600;
+  }
+
+  .chev {
+    color: var(--muted);
+    font-size: 1.2rem;
+    line-height: 1;
+  }
+
+  .tg-more {
+    margin-left: 48px;
+    align-self: flex-start;
+  }
+
+  .risk {
+    margin-left: 48px;
+    font-size: .86rem;
+    color: var(--bad);
+    font-weight: 600;
+  }
+
+  .allgood {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    color: var(--ok);
+    font-weight: 600;
+  }
+
+  /* Painel: filters, KPIs, tasks tabs */
+  .dfilters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .dfilters select { min-width: 0; flex: 0 1 230px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .kpi { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0; text-align: left; }
+  button.kpi { cursor: pointer; }
+  button.kpi:hover { border-color: var(--ink); }
+  .kpi-l { font-size: .86rem; font-weight: 600; color: var(--muted); }
+  .kpi-v { font-family: var(--f-display); font-weight: 800; font-stretch: 88%; font-size: 1.9rem; line-height: 1.1; white-space: nowrap; }
+  .kpi-d { display: block; font-size: .8rem; font-weight: 600; }
+  .kpi-d .ic { width: 14px; height: 14px; display: inline-block; vertical-align: -2px; }
+  .kpi-d .muted { font-weight: 400; }
+  .d-good { color: var(--ok); } .d-bad { color: var(--bad); }
+  .kpi-risk { border-color: var(--bad); background: var(--bad-soft); }
+  .kpi-risk .kpi-v { color: var(--bad); }
+  .dgrid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .ttabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ttab { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface); cursor: pointer; font-weight: 600; font-size: .88rem; min-height: 44px; }
+  .ttab:hover { border-color: var(--ink); }
+  .ttab[aria-selected="true"] { border-color: var(--ink); background: var(--surface-2); }
+  .ttab:disabled { opacity: .45; cursor: default; }
+  .ttab .tt-ic { width: 30px; height: 30px; border-radius: 6px; display: grid; place-items: center; }
+  .ttab .tt-ic .ic { width: 17px; height: 17px; }
+  .ttab b { font-family: var(--f-display); font-size: 1.05rem; }
+  [role="tabpanel"] { display: flex; flex-direction: column; gap: 10px; }
+  [role="tabpanel"] .tlist { margin: 0; }
+  [role="tabpanel"] .risk { margin: 0; display: flex; align-items: center; gap: 6px; }
+  [role="tabpanel"] .linkbtn { align-self: flex-start; }
+  .pipe { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .pipe button { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 10px 2px; border: 0; border-top: 1px solid var(--line); background: none; text-align: left; cursor: pointer; }
+  .pipe li:first-child button { border-top: 0; padding-top: 0; }
+  .pipe button:hover b { text-decoration: underline; text-underline-offset: 3px; }
+  .pipe-n { font-family: var(--f-display); font-weight: 800; font-size: 1.4rem; }
+
+  /* Chart (categorical colors = platform tokens, validated: adjacency CVD ΔE ≥ 9.1 light / 8.4 dark) */
+  .legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .86rem; color: var(--muted); }
+  .legend li { display: inline-flex; align-items: center; gap: 6px; }
+  .legend b { color: var(--ink); font-weight: 600; }
+  .lg-sw { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .chart { position: relative; min-height: 250px; }
+  .chart svg { display: block; max-width: 100%; overflow: visible; }
+  .chart .gl { stroke: var(--line); stroke-width: 1; }
+  .chart .base { stroke: var(--muted); stroke-width: 1; }
+  .chart .ax { fill: var(--muted); font: 11px var(--f-body); font-variant-numeric: tabular-nums; }
+  .chart .cap { fill: var(--ink); font: 600 11.5px var(--f-body); }
+  .chart .el { fill: var(--muted); font: 11.5px var(--f-body); }
+  .chart .col { transition: opacity .15s; }
+  .chart.hovering .col { opacity: .4; }
+  .chart.hovering .col.on { opacity: 1; }
+  .chart .hit { fill: transparent; cursor: pointer; outline: none; }
+  .chart .hit:focus-visible { stroke: var(--accent); stroke-width: 2; }
+  .c-ml { fill: var(--p-ml); } .c-sh { fill: var(--p-sh); } .c-tt { fill: var(--p-tt); } .c-lj { fill: var(--p-lj); }
+  .ctip { position: absolute; z-index: 3; pointer-events: none; min-width: 170px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.12); padding: 10px 12px; font-size: .82rem; display: flex; flex-direction: column; gap: 4px; }
+  .ct-h { font-weight: 600; margin-bottom: 2px; }
+  .ct-r { display: flex; align-items: center; gap: 8px; }
+  .ct-r b { min-width: 2ch; font-variant-numeric: tabular-nums; }
+  .ct-k { width: 12px; height: 3px; border-radius: 2px; flex: none; }
+  .ct-t { border-top: 1px solid var(--line); padding-top: 4px; margin-top: 2px; font-weight: 600; }
+
+  /* Reasons + comparison */
+  .duo { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .mbars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .mbars li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; font-size: .9rem; }
+  .mb-v { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; }
+  .mb-t { grid-column: 1 / -1; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+  .mb-f { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+  .insight { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: 8px; background: var(--warn-soft); font-size: .88rem; }
+  .insight .ic { color: var(--warn); margin-top: 2px; }
+  .tbl { overflow-x: auto; }
+  .tbl table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  .tbl th, .tbl td { padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .tbl th { font-size: .74rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+  .tbl tbody tr:last-child td { border-bottom: 0; }
+  .tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  @media (max-width: 1150px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .dgrid, .duo { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 560px) {
+    .kpi { padding: 12px; }
+    .kpi-v { font-size: 1.45rem; }
+    .dfilters .seg { flex: 1 1 100%; }
+    .dfilters .segb { flex: 1; }
+    .dfilters select { flex: 1 1 100%; }
+  }
+
+
+  /* List */
+  .filters {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .chip {
+    flex: none;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 7px 13px;
+    font-size: .86rem;
+    cursor: pointer;
+    white-space: nowrap;
+    min-height: 38px;
+  }
+
+  .chip.on {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  .chip-n {
+    font-family: var(--f-mono);
+    font-size: .74rem;
+    opacity: .7;
+    margin-left: 2px;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-row input {
+    flex: 1 1 240px;
+    min-width: 0;
+  }
+
+  .filter-row select {
+    flex: 0 1 220px;
+    min-width: 0;
+  }
+
+  .rows {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 140px 240px 110px;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 16px;
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--line);
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .row:first-child {
+    border-top: 0;
+  }
+
+  .row:hover {
+    background: var(--surface-2);
+  }
+
+  .r-main {
+    min-width: 0;
+  }
+
+  .r-main b {
+    font-weight: 600;
+  }
+
+  .r-st {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .r-next {
+    font-size: .8rem;
+    color: var(--muted);
+  }
+
+  .r-next.t-bad {
+    color: var(--bad);
+    font-weight: 600;
+  }
+
+  .r-next.t-warn {
+    color: var(--warn);
+    font-weight: 600;
+  }
+
+  .r-val {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .new {
+    display: inline-block;
+    margin-left: 6px;
+    font: 600 .66rem var(--f-mono);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    background: var(--accent);
+    color: var(--accent-ink);
+    padding: 1px 6px;
+    border-radius: 3px;
+    vertical-align: 2px;
+  }
+
+  .empty {
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  /* Ficha */
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: 0;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 4px 0;
+    font-weight: 600;
+    align-self: flex-start;
+    min-height: 36px;
+  }
+
+  .back:hover {
+    color: var(--ink);
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: center;
+    font-size: .9rem;
+  }
+
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .steps li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+    min-width: 0;
+    padding: 0 2px;
+  }
+
+  .steps li::before {
+    content: "";
+    position: absolute;
+    top: 14px;
+    right: 50%;
+    width: 100%;
+    height: 2px;
+    background: var(--line);
+    z-index: 0;
+  }
+
+  .steps li:first-child::before {
+    display: none;
+  }
+
+  .steps li.st-done::before,
+  .steps li.st-cur::before,
+  .steps li.st-skip::before {
+    background: var(--ok);
+  }
+
+  .sc {
+    position: relative;
+    z-index: 1;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font: 600 .8rem var(--f-mono);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    color: var(--muted);
+  }
+
+  .sc .ic {
+    width: 16px;
+    height: 16px;
+  }
+
+  .st-done .sc {
+    background: var(--ok);
+    border-color: var(--ok);
+    color: var(--surface);
+  }
+
+  .st-cur .sc {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+  }
+
+  .st-bad .sc {
+    background: var(--bad);
+    border-color: var(--bad);
+    color: var(--surface);
+  }
+
+  .st-skip .sc {
+    border-style: dashed;
+    border-color: var(--ok);
+    color: var(--ok);
+  }
+
+  .sl {
+    font-size: .82rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .st-todo .sl {
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .st-cur .sl {
+    color: var(--accent);
+  }
+
+  .sd {
+    font-size: .72rem;
+    color: var(--muted);
+  }
+
+  .next {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+  }
+
+  .next-h {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .next-h>div {
+    min-width: 0;
+    flex: 1 1 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .next-h p.muted {
+    font-size: .92rem;
+  }
+
+  .next-accent {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+  }
+
+  .next-bad {
+    background: var(--bad-soft);
+    border-color: var(--bad);
+  }
+
+  .next-warn {
+    background: var(--warn-soft);
+    border-color: var(--warn);
+  }
+
+  .next-ok {
+    background: var(--ok-soft);
+    border-color: var(--ok);
+  }
+
+  .dsteps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    counter-reset: ds;
+  }
+
+  .dsteps>li {
+    counter-increment: ds;
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+    gap: 10px 12px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+
+  .dsteps>li::before {
+    content: counter(ds);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font: 600 .78rem var(--f-mono);
+    border: 1.5px solid var(--ink);
+  }
+
+  .dsteps>li.wide {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+
+  .dsteps>li.wide .inrow {
+    grid-column: 2;
+  }
+
+  .dsteps b {
+    font-weight: 600;
+  }
+
+  .grid2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .vols {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .vols li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    font-size: .9rem;
+  }
+
+  .vbox {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    font: 600 .76rem var(--f-mono);
+    border: 1.5px dashed var(--muted);
+    color: var(--muted);
+  }
+
+  .vbox.ok {
+    border-style: solid;
+    border-color: var(--ok);
+    background: var(--ok-soft);
+    color: var(--ok);
+  }
+
+  dl.kv {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 8px 14px;
+    margin: 0;
+    font-size: .9rem;
+  }
+
+  dl.kv dt {
+    color: var(--muted);
+  }
+
+  dl.kv dd {
+    margin: 0;
+    min-width: 0;
+  }
+
+  .tl {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .tl li {
+    position: relative;
+    padding: 0 0 14px 24px;
+    font-size: .9rem;
+  }
+
+  .tl li::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 6px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--muted);
+  }
+
+  .tl li::after {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 20px;
+    bottom: 0;
+    width: 1.5px;
+    background: var(--line);
+  }
+
+  .tl li:last-child::after {
+    display: none;
+  }
+
+  .tl li:first-child::before {
+    border-color: var(--accent);
+    background: var(--accent);
+  }
+
+  .tl .when {
+    display: block;
+    font-size: .78rem;
+    color: var(--muted);
+  }
+
+  /* Photos + choices */
+  .photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+  }
+
+  .ph {
+    position: relative;
+    margin: 0;
+    aspect-ratio: 4 / 3;
+    max-width: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+
+  .ph img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ph figcaption {
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    font: 600 .68rem var(--f-mono);
+    background: rgba(0, 0, 0, .62);
+    color: #fff;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .ph-x {
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(0, 0, 0, .62);
+    color: #fff;
+    cursor: pointer;
+    font-size: 17px;
+    line-height: 1;
+  }
+
+  .addph {
+    aspect-ratio: 4 / 3;
+    max-width: 100%;
+    border: 1.5px dashed var(--muted);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    background: none;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: .85rem;
+    text-align: center;
+    padding: 6px;
+    position: relative;
+  }
+
+  .addph.main {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .addph:hover,
+  .addph:focus-within {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .addph .ic {
+    width: 24px;
+    height: 24px;
+  }
+
+  .big2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .bigc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 18px 12px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .bigc .ic {
+    width: 30px;
+    height: 30px;
+  }
+
+  .bigc small {
+    font-weight: 400;
+    color: var(--muted);
+    font-size: .8rem;
+  }
+
+  .bigc.ok .ic {
+    color: var(--ok);
+  }
+
+  .bigc.bad .ic {
+    color: var(--bad);
+  }
+
+  .bigc:hover {
+    border-color: var(--ink);
+  }
+
+  .bigc.ok.on {
+    border-color: var(--ok);
+    background: var(--ok-soft);
+  }
+
+  .bigc.bad.on {
+    border-color: var(--bad);
+    background: var(--bad-soft);
+  }
+
+  .choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .choice {
+    position: relative;
+  }
+
+  .choice input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .choice span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: .92rem;
+    background: var(--surface);
+  }
+
+  .choice input:checked+span {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .choice input:focus-visible+span {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .seg {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .segb {
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    min-height: 44px;
+  }
+
+  .segb.on {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .qnum {
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+    font: 600 .75rem var(--f-mono);
+    margin-right: 8px;
+    vertical-align: 2px;
+  }
+
+  .err {
+    color: var(--bad);
+    font-weight: 600;
+  }
+
+  .sticky-actions {
+    position: sticky;
+    bottom: 0;
+    padding: 12px 0 4px;
+    background: linear-gradient(to bottom, transparent, var(--bg) 35%);
+    z-index: 5;
+  }
+
+  .inrow {
+    display: flex;
+    gap: 8px;
+  }
+
+  .inrow input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .inrow.code input {
+    font-family: var(--f-mono);
+    letter-spacing: .04em;
+  }
+
+  /* Receber */
+  .recv {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+
+  .recv-main,
+  .recv-side {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .viewfinder {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    max-width: 100%;
+    background: var(--scan);
+    border-radius: 10px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+  }
+
+  .vf-label {
+    width: 44%;
+    aspect-ratio: 2.2 / 1;
+    background: #EDEDE8;
+    border-radius: 3px;
+    padding: 6% 7%;
+    display: flex;
+    flex-direction: column;
+    gap: 6%;
+    opacity: .45;
+    transform: rotate(-3deg);
+  }
+
+  .vf-bars {
+    flex: 1;
+    background: repeating-linear-gradient(90deg, #111 0 2px, transparent 2px 4px, #111 4px 5px, transparent 5px 8px, #111 8px 11px, transparent 11px 12px);
+  }
+
+  .vf-num {
+    height: 12%;
+    background: repeating-linear-gradient(90deg, #555 0 5px, transparent 5px 7px);
+  }
+
+  .scanning .vf-label {
+    opacity: .95;
+  }
+
+  .vf-frame {
+    position: absolute;
+    inset: 14% 18%;
+    border: 2px solid rgba(255, 255, 255, .22);
+    border-radius: 8px;
+  }
+
+  .vf-line {
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    top: 50%;
+    height: 2px;
+    background: var(--scan-line);
+    box-shadow: 0 0 14px var(--scan-line);
+    opacity: .3;
+  }
+
+  .scanning .vf-line {
+    opacity: 1;
+    animation: sweep 1s ease-in-out infinite alternate;
+  }
+
+  @keyframes sweep {
+    from {
+      top: 18%;
+    }
+
+    to {
+      top: 82%;
+    }
+  }
+
+  .vf-txt {
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: rgba(255, 255, 255, .75);
+    font: 500 .74rem var(--f-mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .lbl {
+    font-size: .88rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .result {
+    border-radius: 10px;
+    padding: 16px;
+    border: 2px solid;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    animation: pop .25s ease-out;
+  }
+
+  @keyframes pop {
+    from {
+      transform: scale(.985);
+    }
+
+    to {
+      transform: none;
+    }
+  }
+
+  .res-ok {
+    background: var(--ok-soft);
+    border-color: var(--ok);
+  }
+
+  .res-warn {
+    background: var(--warn-soft);
+    border-color: var(--warn);
+  }
+
+  .res-bad {
+    background: var(--bad-soft);
+    border-color: var(--bad);
+  }
+
+  .res-h {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  .res-ok .res-h {
+    color: var(--ok);
+  }
+
+  .res-warn .res-h {
+    color: var(--warn);
+  }
+
+  .res-bad .res-h {
+    color: var(--bad);
+  }
+
+  .res-h .mono {
+    margin-left: auto;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: .8rem;
+  }
+
+  .res-h .ic {
+    width: 24px;
+    height: 24px;
+  }
+
+  .res-prod {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 1.3rem;
+    font-stretch: 90%;
+  }
+
+  .res-vol {
+    font-weight: 600;
+  }
+
+  .res-btns {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .res-btns .btn {
+    flex: 1 1 180px;
+  }
+
+  details.tests>summary {
+    cursor: pointer;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  details.tests>summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details.tests>summary::after {
+    content: "+";
+    font-family: var(--f-mono);
+    color: var(--muted);
+  }
+
+  details.tests[open]>summary::after {
+    content: "–";
+  }
+
+  .codes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .code-b {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface-2);
+    padding: 9px 10px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .code-b:hover {
+    border-color: var(--ink);
+  }
+
+  .code-b .mono {
+    font-weight: 600;
+  }
+
+  .code-b small {
+    color: var(--muted);
+    font-size: .78rem;
+    text-align: right;
+    min-width: 0;
+  }
+
+  .today {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: .88rem;
+  }
+
+  .today li {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 24px;
+    background: var(--ink);
+    color: var(--bg);
+    padding: 11px 16px;
+    border-radius: 8px;
+    font-size: .9rem;
+    font-weight: 500;
+    width: max-content;
+    max-width: calc(100% - 32px);
+    z-index: 30;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, .2);
+  }
+
+  .spin {
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: rot .8s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes rot {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (max-width: 1150px) {
+    .grid2 {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .guide ol {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .flow {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .flow li:nth-child(4)::before {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1000px) {
+
+    .duo,
+    .recv {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .app {
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .side {
+      display: none;
+    }
+
+    .mtop {
+      display: flex;
+      padding: 12px 16px 0;
+      font-size: 1rem;
+    }
+
+    .mtop .ic {
+      width: 30px;
+      height: 30px;
+      padding: 5px;
+    }
+
+    main {
+      padding: 16px 16px calc(96px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .view {
+      gap: 16px;
+    }
+
+    .tabbar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: end;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+      padding: 4px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+      z-index: 20;
+    }
+
+    .tabbar button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      border: 0;
+      background: none;
+      color: var(--muted);
+      font-size: .74rem;
+      font-weight: 600;
+      padding: 6px;
+      cursor: pointer;
+      position: relative;
+      min-height: 54px;
+      justify-content: flex-end;
+    }
+
+    .tabbar button.on {
+      color: var(--ink);
+    }
+
+    .tabbar .ic {
+      width: 24px;
+      height: 24px;
+    }
+
+    .tabbar .tb-main .ic {
+      width: 52px;
+      height: 52px;
+      padding: 13px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--accent-ink);
+      margin-top: -26px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .18);
+    }
+
+    .tabbar .tb-main {
+      color: var(--accent);
+    }
+
+    .tabbar .badge {
+      position: absolute;
+      top: 2px;
+      left: calc(50% + 6px);
+      margin: 0;
+    }
+
+    .tabbar .tb-main .badge {
+      top: -28px;
+      left: calc(50% + 14px);
+    }
+
+    .sticky-actions {
+      bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .toast {
+      bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    }
+  }
+
+  @media (max-width: 760px) {
+    .row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: "m v" "p s";
+      gap: 8px 12px;
+    }
+
+    .r-main {
+      grid-area: m;
+    }
+
+    .r-val {
+      grid-area: v;
+    }
+
+    .r-plat {
+      grid-area: p;
+    }
+
+    .r-st {
+      grid-area: s;
+      align-items: flex-end;
+      text-align: right;
+    }
+
+    .flow {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+    }
+
+    .flow li+li::before {
+      display: none;
+    }
+
+    .fl {
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+    }
+
+    .fl-n {
+      font-size: 1.4rem;
+      min-width: 2ch;
+    }
+
+    .fl-l {
+      margin-top: 0;
+    }
+
+    .fl-h {
+      margin-left: auto;
+      text-align: right;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .guide ol {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .money {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .bar {
+      grid-template-columns: 96px minmax(0, 1fr) 24px;
+    }
+
+    .sum {
+      padding: 10px;
+    }
+
+    .sum-n {
+      font-size: 1.7rem;
+    }
+
+    .sum-l {
+      font-size: .84rem;
+    }
+
+    .tlist,
+    .tg-more,
+    .risk {
+      margin-left: 0;
+    }
+
+    .trow {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .trow .chev {
+      display: none;
+    }
+
+    .steps .sd {
+      display: none;
+    }
+
+    .sl {
+      font-size: .74rem;
+    }
+
+    .dsteps>li {
+      grid-template-columns: 28px minmax(0, 1fr);
+    }
+
+    .dsteps>li>.btn {
+      grid-column: 2;
+      justify-self: start;
+    }
+
+    .page-h .btn-lg {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+</style>
+
+<div class="demo-strip">
+  <span><b>Demonstração</b> · dados fictícios, nada fica salvo</span>
+  <button type="button" data-act="reset">Reiniciar</button>
+</div>
+
+<header class="mtop brand" data-ic="logo"><span>Recupera<small>Controle de devoluções</small></span></header>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand" data-ic="logo"><span>Recupera<small>Controle de devoluções</small></span></div>
+    <nav class="nav" aria-label="Menu">
+      <button type="button" data-act="nav" data-v="painel" data-nav="painel" data-ic="home"><span>Painel</span><span
+          class="badge" data-badge="painel" hidden></span></button>
+      <button type="button" data-act="nav" data-v="receber" data-nav="receber" data-ic="scan"><span>Receber
+          pacote</span><span class="badge neutral" data-badge="receber" hidden></span></button>
+      <button type="button" data-act="nav" data-v="lista" data-nav="lista" data-ic="list"><span>Todas as
+          devoluções</span></button>
+    </nav>
+    <div class="side-foot">
+      <span>Plataformas conectadas</span>
+      <span>Mercado Livre · Shopee · TikTok Shop · Loja própria</span>
+    </div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<nav class="tabbar" aria-label="Menu">
+  <button type="button" data-act="nav" data-v="painel" data-nav="painel" data-ic="home"><span>Painel</span><span
+      class="badge" data-badge="painel" hidden></span></button>
+  <button type="button" class="tb-main" data-act="nav" data-v="receber" data-nav="receber" data-ic="scan"><span>Receber
+      pacote</span><span class="badge neutral" data-badge="receber" hidden></span></button>
+  <button type="button" data-act="nav" data-v="lista" data-nav="lista" data-ic="list"><span>Devoluções</span></button>
+</nav>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+  (function () {
+    'use strict';
+
+    /* ---------- helpers ---------- */
+    var DAY = 864e5;
+    var BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+    function money(v) { return BRL.format(v || 0); }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+    function $(s) { return document.querySelector(s); }
+    function ago(d, h, m) { var x = new Date(); x.setDate(x.getDate() - d); x.setHours(h == null ? 10 : h, m || 0, 0, 0); return Math.min(x.getTime(), Date.now() - 60000); }
+    function dayStart(t) { var x = new Date(t); x.setHours(0, 0, 0, 0); return x.getTime(); }
+    function daysSince(t) { return Math.round((dayStart(Date.now()) - dayStart(t)) / DAY); }
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function hhmm(t) { var x = new Date(t); return pad(x.getHours()) + ':' + pad(x.getMinutes()); }
+    function ddmm(t) { var x = new Date(t); return pad(x.getDate()) + '/' + pad(x.getMonth() + 1); }
+    function quando(t) { var d = daysSince(t); if (d === 0) return 'hoje às ' + hhmm(t); if (d === 1) return 'ontem às ' + hhmm(t); return ddmm(t) + ' às ' + hhmm(t); }
+    function curto(t) { var d = daysSince(t); return d === 0 ? 'hoje' : d === 1 ? 'ontem' : ddmm(t); }
+    function parseValor(s) { var v = parseFloat(String(s).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')); return isNaN(v) ? 0 : v; }
+    function num(v) { return (v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function plural(n, a, b) { return n + ' ' + (n === 1 ? a : b); }
+    function wide() { return window.matchMedia ? matchMedia('(min-width: 901px)').matches : true; }
+
+    var IC = {
+      home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+      list: '<path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',
+      scan: '<path d="M3 7V4h3M21 7V4h-3M3 17v3h3M21 17v3h-3M7 8v8M10 8v8M13.5 8v8M17 8v8"/>',
+      refresh: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>',
+      camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+      image: '<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 16l5-5 4 4 3-3 6 6"/>',
+      check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+      checkc: '<circle cx="12" cy="12" r="9"/><path d="M7.5 12.5l3 3 6-6.5"/>',
+      warn: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/>',
+      x: '<circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/>',
+      logo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+      box: '<path d="M3 7.5l9-4.5 9 4.5v9l-9 4.5-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9M7.5 5.2l9 4.6"/>',
+      copy: '<rect x="9" y="9" width="11" height="11" rx="1"/><path d="M5 15V5a1 1 0 0 1 1-1h9"/>',
+      download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+      gavel: '<path d="M14 4l6 6M11 7l6 6M8.5 9.5l6 6M4 20l7-7"/>',
+      truck: '<path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>',
+      shelf: '<path d="M4 4v16M20 4v16M4 9h16M4 15h16"/>',
+      q: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .8-1 1.5v.4M12 17h.01"/>',
+      back: '<path d="M15 5l-7 7 7 7"/>'
+    };
+    function icon(n) { return '<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + IC[n] + '</svg>'; }
+
+    /* ---------- domain ---------- */
+    var PLAT = {
+      ml: { nome: 'Mercado Livre', prazo: 5 },
+      sh: { nome: 'Shopee', prazo: 7 },
+      tt: { nome: 'TikTok Shop', prazo: 5 },
+      lj: { nome: 'Loja própria', prazo: 15 }
+    };
+    var PRAZO_CHEGADA = 10;
+    var COND = { ok: 'Em bom estado', danificado: 'Danificado', faltando: 'Faltando peças', diferente: 'Produto diferente', violada: 'Embalagem violada' };
+    var PROBLEMAS = ['danificado', 'faltando', 'diferente', 'violada'];
+    var ESTOQUE = 'Rafael (estoque)', GESTAO = 'Luciana (gestão)', PLATF = 'Plataforma', VOCE = 'Você';
+
+    var SEED = [
+      { id: 'DV-1041', plat: 'ml', pedido: '2000009187340', produto: 'Guarda-roupa Casal 6 Portas', nvol: 3, valor: 1899.90, motivo: 'Produto chegou avariado', sol: 9, apr: 8, rec: [5, 5, 5], cond: 'danificado', insp: 5, obs: 'Porta central rachada e quina da lateral esquerda quebrada.', nf: 4 },
+      { id: 'DV-1038', plat: 'sh', pedido: '251001K7PQ2M', produto: 'Rack para TV até 65"', nvol: 2, valor: 689.90, motivo: 'Desistência da compra', sol: 11, apr: 10, rec: [6, 6], cond: 'danificado', insp: 6, obs: 'Tampo riscado e um dos pés solto.', nf: 3 },
+      { id: 'DV-1044', plat: 'tt', pedido: '577120934418', produto: 'Painel para TV com Nichos', nvol: 1, valor: 459.90, motivo: 'Produto diferente do anúncio', sol: 7, apr: 6, rec: [3], cond: 'danificado', insp: 3, obs: 'Painel empenado e furação não confere com o manual.', nf: 2 },
+      { id: 'DV-1046', plat: 'ml', pedido: '2000009203115', produto: 'Cômoda 5 Gavetas', nvol: 1, valor: 549.90, motivo: 'Produto chegou avariado', sol: 6, apr: 5, rec: [1] },
+      { id: 'DV-1047', plat: 'sh', pedido: '251003R2XW8B', produto: 'Mesa de Jantar 6 Lugares', nvol: 2, valor: 1349.00, motivo: 'Desistência da compra', sol: 6, apr: 5, rec: [1, null] },
+      { id: 'DV-1049', plat: 'ml', pedido: '2000009211870', produto: 'Penteadeira com Espelho', nvol: 1, valor: 629.90, motivo: 'Produto chegou avariado', sol: 4, apr: 2 },
+      { id: 'DV-1050', plat: 'sh', pedido: '251004M9TT3C', produto: 'Conjunto 4 Cadeiras Estofadas', nvol: 2, valor: 899.90, motivo: 'Cor diferente da foto', sol: 4, apr: 3 },
+      { id: 'DV-1051', plat: 'tt', pedido: '577145520087', produto: 'Sapateira 20 Pares', nvol: 1, valor: 239.90, motivo: 'Desistência da compra', sol: 2, apr: 1 },
+      { id: 'DV-1052', plat: 'ml', pedido: '2000009220461', produto: 'Beliche com Escada', nvol: 3, valor: 1289.00, motivo: 'Faltando peças', sol: 5, apr: 4 },
+      { id: 'DV-1033', plat: 'sh', pedido: '250922H4LD6Q', produto: 'Escrivaninha com Gaveteiro', nvol: 1, valor: 389.90, motivo: 'Produto chegou avariado', sol: 14, apr: 13 },
+      { id: 'DV-1053', plat: 'ml', pedido: '2000009231002', produto: 'Estante Livreiro 5 Prateleiras', nvol: 1, valor: 419.90, motivo: 'Desistência da compra', sol: 1 },
+      { id: 'DV-1054', plat: 'lj', pedido: '#10482', produto: 'Aparador Industrial', nvol: 1, valor: 599.00, motivo: 'Produto chegou avariado', sol: 1 },
+      { id: 'DV-1035', plat: 'sh', pedido: '250925B8NC1F', produto: 'Criado-mudo 2 Gavetas', nvol: 1, valor: 189.90, motivo: 'Desistência da compra', sol: 8, recusada: 5 },
+      { id: 'DV-1029', plat: 'ml', pedido: '2000009102778', produto: 'Balcão de Cozinha 2 Portas', nvol: 2, valor: 749.90, motivo: 'Produto chegou avariado', sol: 15, apr: 14, rec: [9, 9], cond: 'danificado', insp: 9, obs: 'Porta solta e tampo trincado.', nf: 3, disp: { ab: 8, prot: 'MED-48812093', valor: 749.90 } },
+      { id: 'DV-1031', plat: 'tt', pedido: '577098812345', produto: 'Mesa de Centro Ripada', nvol: 1, valor: 329.90, motivo: 'Produto diferente do anúncio', sol: 12, apr: 11, rec: [7], cond: 'diferente', insp: 7, obs: 'Cliente devolveu o modelo liso, sem ripas.', nf: 2, disp: { ab: 6, prot: 'TT-77310245', valor: 329.90 } },
+      { id: 'DV-1018', plat: 'ml', pedido: '2000008990143', produto: 'Base Cama Box Casal', nvol: 2, valor: 1249.00, motivo: 'Produto chegou avariado', sol: 26, apr: 25, rec: [21, 21], cond: 'danificado', insp: 21, obs: 'Estrutura quebrada em dois pontos.', nf: 4, disp: { ab: 20, prot: 'MED-47720981', valor: 1249.00, res: 'ganha', rec: 1249.00, fim: 12 } },
+      { id: 'DV-1021', plat: 'sh', pedido: '250911P3QA7Z', produto: 'Buffet 2 Portas', nvol: 2, valor: 899.90, motivo: 'Produto chegou avariado', sol: 24, apr: 23, rec: [18, 18], cond: 'danificado', insp: 18, obs: 'Lateral rachada.', nf: 3, disp: { ab: 17, prot: 'SPE-2209183', valor: 899.90, res: 'ganha', rec: 899.90, fim: 9 } },
+      { id: 'DV-1024', plat: 'ml', pedido: '2000009031876', produto: 'Guarda-roupa Solteiro 3 Portas', nvol: 2, valor: 979.90, motivo: 'Faltando peças', sol: 22, apr: 21, rec: [16, 16], cond: 'faltando', insp: 16, obs: 'Faltam as 3 portas e o kit de ferragens.', nf: 2, disp: { ab: 15, prot: 'MED-47991204', valor: 979.90, res: 'ganha', rec: 640.00, fim: 6 } },
+      { id: 'DV-1012', plat: 'tt', pedido: '576990144231', produto: 'Cabeceira Casal Estofada', nvol: 1, valor: 459.90, motivo: 'Produto chegou avariado', sol: 28, apr: 27, rec: [22], cond: 'danificado', insp: 22, obs: 'Tecido rasgado.', nf: 2, disp: { ab: 14, prot: 'TT-76220931', valor: 459.90, res: 'perdida', motivo: 'Disputa aberta fora do prazo', fim: 10 } },
+      { id: 'DV-1026', plat: 'lj', pedido: '#10377', produto: 'Cômoda 4 Gavetas', nvol: 1, valor: 499.00, motivo: 'Desistência da compra', sol: 20, apr: 19, rec: [14], cond: 'ok', insp: 14, estoque: 14 },
+      { id: 'DV-1009', plat: 'ml', pedido: '2000008901217', produto: 'Conjunto Rack e Painel', nvol: 2, valor: 1590.00, motivo: 'Produto chegou avariado', sol: 29, apr: 28, rec: [23, 23], cond: 'danificado', insp: 23, obs: 'Painel partido ao meio.', nf: 4, disp: { ab: 22, prot: 'MED-47511820', valor: 1590.00, res: 'ganha', rec: 1590.00, fim: 15 } },
+      { id: 'DV-1015', plat: 'sh', pedido: '250905Z1KM4R', produto: 'Mesa de Jantar 4 Lugares', nvol: 2, valor: 1120.00, motivo: 'Produto chegou avariado', sol: 27, apr: 26, rec: [20, 20], cond: 'danificado', insp: 20, obs: 'Tampo de vidro trincado.', nf: 3, disp: { ab: 19, prot: 'SPE-2198834', valor: 1120.00, res: 'ganha', rec: 1120.00, fim: 8 } }
+    ];
+
+    function build(o) {
+      var n = parseInt(o.id.slice(3), 10);
+      var aprovada = o.apr != null || o.aprAbs;
+      var r = {
+        id: o.id, plat: o.plat, pedido: o.pedido, produto: o.produto, valor: o.valor, motivo: o.motivo,
+        statusPlat: o.recusada != null ? 'recusada' : (aprovada ? 'aprovada' : 'analise'),
+        solicitadaEm: o.solAbs || ago(o.sol, 9, 10 + n % 40),
+        aprovadaEm: o.aprAbs || (o.apr != null ? ago(o.apr, 11, n % 50) : null),
+        recusadaEm: o.recusada != null ? ago(o.recusada, 14, n % 50) : null,
+        volumes: [], condicao: o.cond || null,
+        inspecionadaEm: o.insp != null ? ago(o.insp, 10, 30 + n % 20) : null,
+        obs: o.obs || '', fotos: [], disputa: null, estoque: false, encerradaEm: null, novo: !!o.novo, timeline: []
+      };
+      for (var i = 0; i < o.nvol; i++) {
+        var d = o.rec && o.rec[i] != null ? o.rec[i] : null;
+        r.volumes.push({ n: i + 1, codigo: 'BR26' + n + pad(i + 1), recebidoEm: d != null ? ago(d, 8, 5 + i * 3 + n % 30) : null, por: ESTOQUE });
+      }
+      var vr = r.volumes.filter(function (v) { return v.recebidoEm; }).map(function (v) { return v.n; });
+      for (var k = 0; k < (o.nf || 0); k++) r.fotos.push({ ex: true, seed: n * 10 + k, vol: vr.length ? vr[k % vr.length] : 1 });
+      var tl = r.timeline;
+      tl.push({ t: r.solicitadaEm, txt: 'Cliente pediu a devolução: ' + r.motivo.toLowerCase(), por: PLATF });
+      if (r.aprovadaEm) tl.push({ t: r.aprovadaEm, txt: 'Aprovada pela plataforma', por: PLATF });
+      if (r.recusadaEm) tl.push({ t: r.recusadaEm, txt: 'Recusada pela plataforma', por: PLATF });
+      r.volumes.forEach(function (v) { if (v.recebidoEm) tl.push({ t: v.recebidoEm, txt: 'Volume ' + v.n + ' de ' + o.nvol + ' chegou (bipado)', por: ESTOQUE }); });
+      if (r.inspecionadaEm) tl.push({ t: r.inspecionadaEm, txt: 'Conferido: ' + COND[r.condicao] + (r.fotos.length ? ' · ' + r.fotos.length + ' fotos' : ''), por: ESTOQUE });
+      if (o.disp) {
+        var D = o.disp;
+        r.disputa = { abertaEm: ago(D.ab, 15, n % 50), protocolo: D.prot, valor: D.valor, resultado: D.res || null, valorRecebido: D.rec || 0, motivoPerda: D.motivo || '', fechadaEm: D.fim != null ? ago(D.fim, 16, n % 40) : null };
+        tl.push({ t: r.disputa.abertaEm, txt: 'Disputa aberta · protocolo ' + D.prot, por: GESTAO });
+        if (D.res === 'ganha') tl.push({ t: r.disputa.fechadaEm, txt: 'Disputa ganha · reembolso de ' + money(D.rec), por: GESTAO });
+        if (D.res === 'perdida') tl.push({ t: r.disputa.fechadaEm, txt: 'Disputa perdida · ' + D.motivo, por: GESTAO });
+      }
+      if (o.estoque != null) { r.estoque = true; r.encerradaEm = ago(o.estoque, 16, 0); tl.push({ t: r.encerradaEm, txt: 'Voltou ao estoque · devolução encerrada', por: ESTOQUE }); }
+      return r;
+    }
+    function newOnes() {
+      var now = Date.now();
+      return [
+        { id: 'DV-1055', plat: 'ml', pedido: '2000009240318', produto: 'Rack Suspenso 1,80 m', nvol: 1, valor: 349.90, motivo: 'Produto chegou avariado', solAbs: now - 20 * 3600e3, aprAbs: now - 2 * 3600e3, novo: true },
+        { id: 'DV-1056', plat: 'sh', pedido: '251005T6GH9K', produto: 'Guarda-roupa 4 Portas com Espelho', nvol: 2, valor: 1459.00, motivo: 'Produto chegou avariado', solAbs: now - 18 * 3600e3, aprAbs: now - 3 * 3600e3, novo: true },
+        { id: 'DV-1057', plat: 'tt', pedido: '577160077312', produto: 'Mesa Lateral Redonda', nvol: 1, valor: 199.90, motivo: 'Desistência da compra', solAbs: now - 4 * 3600e3, novo: true }
+      ];
+    }
+
+    /* ~90 days of closed, fictitious history so the dashboard has trends to show (deterministic) */
+    var CATALOGO = [['Guarda-roupa Casal 6 Portas', 3, 1899.90], ['Guarda-roupa Solteiro 3 Portas', 2, 979.90], ['Cômoda 5 Gavetas', 1, 549.90], ['Rack para TV até 65"', 2, 689.90],
+      ['Painel para TV com Nichos', 1, 459.90], ['Mesa de Jantar 6 Lugares', 2, 1349.00], ['Mesa de Centro Ripada', 1, 329.90], ['Conjunto 4 Cadeiras Estofadas', 2, 899.90],
+      ['Sapateira 20 Pares', 1, 239.90], ['Penteadeira com Espelho', 1, 629.90], ['Escrivaninha com Gaveteiro', 1, 389.90], ['Estante Livreiro 5 Prateleiras', 1, 419.90],
+      ['Base Cama Box Casal', 2, 1249.00], ['Cabeceira Casal Estofada', 1, 459.90], ['Balcão de Cozinha 2 Portas', 2, 749.90], ['Buffet 2 Portas', 2, 899.90],
+      ['Criado-mudo 2 Gavetas', 1, 189.90], ['Aparador Industrial', 1, 599.00]];
+    var MOTIVOS = [['Produto chegou avariado', .56], ['Desistência da compra', .18], ['Faltando peças', .1], ['Produto diferente do anúncio', .1], ['Cor diferente da foto', .06]];
+    var PERDAS = ['Disputa aberta fora do prazo', 'Fotos não aceitas pela plataforma', 'Plataforma deu razão ao cliente'];
+    function genHist() {
+      var R = rng(2026), out = [], id = 101;
+      var pick = function (list) { var x = R(), acc = 0; for (var i = 0; i < list.length; i++) { acc += list[i][1]; if (x < acc) return list[i][0]; } return list[list.length - 1][0]; };
+      var digits = function (n) { var s = ''; for (var i = 0; i < n; i++) s += Math.floor(R() * 10); return s; };
+      var PL = [['ml', .4], ['sh', .3], ['tt', .18], ['lj', .12]];
+      for (var d = 90; d >= 12; d--) {
+        var lam = d >= 30 ? 1.3 : 1.0, n = (R() < lam / 2 ? 1 : 0) + (R() < lam / 2 ? 1 : 0); /* recent days also hold the open demo returns */
+        for (var k = 0; k < n; k++) {
+          var plat = pick(PL), prod = CATALOGO[Math.floor(R() * CATALOGO.length)], motivo = pick(MOTIVOS);
+          var rec = d - 3 - Math.floor(R() * 4), recs = [];
+          for (var v = 0; v < prod[1]; v++) recs.push(rec);
+          var cond = motivo === 'Produto chegou avariado' ? 'danificado' : motivo === 'Faltando peças' ? 'faltando' :
+            motivo === 'Desistência da compra' ? (R() < .55 ? 'ok' : 'danificado') : 'diferente';
+          var pedido = plat === 'ml' ? '20000' + digits(8) : plat === 'sh' ? '25' + digits(4) + 'X' + digits(5) : plat === 'tt' ? '57' + digits(10) : '#10' + digits(3);
+          var o = { id: 'DV-0' + (id++), plat: plat, pedido: pedido, produto: prod[0], nvol: prod[1], valor: prod[2], motivo: motivo, sol: d, apr: d - 1, rec: recs, cond: cond, insp: rec };
+          if (cond === 'ok') o.estoque = rec;
+          else {
+            var ab = rec - Math.floor(R() * 3), x = R(), fim = Math.max(1, ab - 3 - Math.floor(R() * 6));
+            var prot = { ml: 'MED-4', sh: 'SPE-2', tt: 'TT-7', lj: 'LJ-' }[plat] + digits(6);
+            o.nf = 2 + Math.floor(R() * 3);
+            o.disp = x < .7 ? { ab: ab, prot: prot, valor: prod[2], res: 'ganha', rec: prod[2], fim: fim }
+              : x < .84 ? { ab: ab, prot: prot, valor: prod[2], res: 'ganha', rec: Math.round(prod[2] * (.45 + R() * .35)), fim: fim }
+                : { ab: ab, prot: prot, valor: prod[2], res: 'perdida', motivo: PERDAS[Math.floor(R() * PERDAS.length)], fim: fim };
+          }
+          out.push(o);
+        }
+      }
+      return out;
+    }
+
+    var DB, S;
+    function reset() {
+      DB = SEED.concat(genHist()).map(build);
+      S = {
+        view: 'painel', per: 30, dplat: '', ttab: null, chartTable: false, id: null, filtro: 'acao', plat: '', q: '', synced: false, syncing: false, lastSync: ago(1, 18, 42), guideOpen: wide(),
+        done: { sync: false, ficha: false, scan: false, disp: false }, naoId: [], scan: null, scanning: false, draft: null, form: null, txtFallback: null
+      };
+    }
+    function byId(id) { for (var i = 0; i < DB.length; i++) if (DB[i].id === id) return DB[i]; return null; }
+
+    /* One vocabulary for every stage */
+    function status(r) {
+      if (r.disputa && r.disputa.resultado === 'ganha') return { k: 'ganha', t: 'Reembolsada', c: 'ok' };
+      if (r.disputa && r.disputa.resultado === 'perdida') return { k: 'perdida', t: 'Disputa perdida', c: 'bad' };
+      if (r.estoque) return { k: 'estoque', t: 'Voltou ao estoque', c: 'ok' };
+      if (r.disputa) return { k: 'disputa', t: 'Em disputa', c: 'ink' };
+      if (r.condicao) return r.condicao === 'ok' ? { k: 'inspecionada', t: 'Conferida · em bom estado', c: 'ok' } : { k: 'inspecionada', t: 'Abrir disputa', c: 'accent' };
+      var rec = r.volumes.filter(function (v) { return v.recebidoEm; }).length;
+      if (rec && rec === r.volumes.length) return { k: 'recebida', t: 'Falta conferir', c: 'warn' };
+      if (rec) return { k: 'parcial', t: 'Chegou em parte (' + rec + '/' + r.volumes.length + ')', c: 'warn' };
+      if (r.statusPlat === 'recusada') return { k: 'recusada', t: 'Recusada', c: 'muted' };
+      if (r.statusPlat === 'analise') return { k: 'analise', t: 'Em análise', c: 'muted' };
+      return { k: 'aguardando', t: 'A caminho', c: 'info' };
+    }
+    var CLOSED = ['ganha', 'perdida', 'estoque'];
+    function recebCompleto(r) { if (!r.volumes.every(function (v) { return v.recebidoEm; })) return null; return Math.max.apply(null, r.volumes.map(function (v) { return v.recebidoEm; })); }
+    function prazoRest(r) { var t = recebCompleto(r); if (!t) return null; return PLAT[r.plat].prazo - daysSince(t); }
+    function precisaDisputa(r) { var k = status(r).k; return k === 'recebida' || (k === 'inspecionada' && r.condicao !== 'ok'); }
+    function prazoInfo(r) {
+      if (!precisaDisputa(r)) return null;
+      var left = prazoRest(r); if (left == null) return null;
+      if (left < 0) return { t: 'Prazo vencido', c: 'bad', left: left };
+      if (left === 0) return { t: 'Vence hoje', c: 'bad', left: left };
+      if (left <= 2) return { t: left === 1 ? 'Falta 1 dia' : 'Faltam 2 dias', c: 'warn', left: left };
+      return { t: 'Faltam ' + left + ' dias', c: 'muted', left: left };
+    }
+    function atrasada(r) { return status(r).k === 'aguardando' && daysSince(r.aprovadaEm) > PRAZO_CHEGADA; }
+    function nextStepTxt(r) {
+      var k = status(r).k;
+      switch (k) {
+        case 'analise': return 'Aguardar a plataforma';
+        case 'aguardando': return atrasada(r) ? 'Não chegou: cobrar a plataforma' : 'Aguardar o pacote chegar';
+        case 'parcial': return 'Aguardar o restante';
+        case 'recebida': return 'Conferir e fotografar';
+        case 'inspecionada': return r.condicao === 'ok' ? 'Devolver ao estoque' : 'Abrir a disputa';
+        case 'disputa': return 'Aguardar resposta da plataforma';
+        default: return '';
+      }
+    }
+    function tasks(plat) {
+      var g = { disputa: [], conferir: [], cobrar: [], estoque: [] };
+      DB.forEach(function (r) { if (plat && r.plat !== plat) return;
+        var k = status(r).k;
+        if (k === 'inspecionada') (r.condicao === 'ok' ? g.estoque : g.disputa).push(r);
+        else if (k === 'recebida' || k === 'parcial') g.conferir.push(r);
+        else if (atrasada(r)) g.cobrar.push(r);
+      });
+      var byPrazo = function (a, b) { var x = prazoRest(a), y = prazoRest(b); return (x == null ? 99 : x) - (y == null ? 99 : y); };
+      g.disputa.sort(byPrazo); g.conferir.sort(byPrazo);
+      return g;
+    }
+    function nTasks() { var g = tasks(); return g.disputa.length + g.conferir.length + g.cobrar.length + g.estoque.length + S.naoId.length; }
+    function match(r, f) {
+      var k = status(r).k;
+      switch (f) {
+        case 'todas': return true;
+        case 'acao': return k === 'recebida' || k === 'parcial' || k === 'inspecionada' || atrasada(r);
+        case 'recebida': return k === 'recebida' || k === 'parcial';
+        case 'pronta': return k === 'inspecionada' && r.condicao !== 'ok';
+        case 'encerrada': return CLOSED.indexOf(k) >= 0;
+        case 'aprovada': return r.statusPlat === 'aprovada';
+        case 'plat-analise': return r.statusPlat === 'analise';
+        case 'plat-recusada': return r.statusPlat === 'recusada';
+        default: return k === f;
+      }
+    }
+    function lastAct(r) { return Math.max.apply(null, r.timeline.map(function (e) { return e.t; })); }
+
+    /* ---------- example photos ---------- */
+    var fcache = {};
+    function rng(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+    function exFoto(seed, label) {
+      var key = seed + '|' + label; if (fcache[key]) return fcache[key];
+      var c = document.createElement('canvas'); c.width = 480; c.height = 360;
+      var x = c.getContext('2d'); var R = rng(seed);
+      var pals = [['#B88A5C', '#9A6B42'], ['#DCCFB9', '#C2B194'], ['#6A4B37', '#4E3627'], ['#ECE9E3', '#D4CFC5'], ['#3A3F42', '#2A2E31']];
+      var p = pals[Math.floor(R() * pals.length)];
+      x.fillStyle = '#8F8B85'; x.fillRect(0, 0, 480, 360);
+      x.fillStyle = 'rgba(255,255,255,.08)'; for (var i = 0; i < 7; i++) x.fillRect(0, i * 56 + R() * 8, 480, 2);
+      var px = 40 + R() * 30, py = 26 + R() * 20, pw = 400 - R() * 40, ph = 270 - R() * 30;
+      var g = x.createLinearGradient(px, py, px + pw, py + ph); g.addColorStop(0, p[0]); g.addColorStop(1, p[1]);
+      x.fillStyle = g; x.fillRect(px, py, pw, ph);
+      x.globalAlpha = .16; x.strokeStyle = '#000'; x.lineWidth = 1;
+      for (i = 0; i < 28; i++) { x.beginPath(); var y0 = py + R() * ph; x.moveTo(px, y0); for (var s = 1; s <= 8; s++) x.lineTo(px + pw * s / 8, y0 + (R() - .5) * 6); x.stroke(); }
+      x.globalAlpha = 1; x.strokeStyle = 'rgba(0,0,0,.35)'; x.lineWidth = 3; x.strokeRect(px, py, pw, ph);
+      var cx = R() < .5 ? px : px + pw, cy = R() < .5 ? py : py + ph, sx = cx === px ? 1 : -1, sy = cy === py ? 1 : -1;
+      x.fillStyle = '#CDB78F'; x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + sx * (40 + R() * 40), cy); x.lineTo(cx + sx * (18 + R() * 10), cy + sy * (20 + R() * 10)); x.lineTo(cx, cy + sy * (40 + R() * 40)); x.closePath(); x.fill();
+      x.strokeStyle = 'rgba(20,12,6,.85)'; x.lineWidth = 2.5; x.beginPath();
+      var qx = px + pw * (.25 + R() * .4), qy = py + 3; x.moveTo(qx, qy);
+      var stop = py + ph * (.5 + R() * .45); while (qy < stop) { qx += (R() - .5) * 30; qy += 10 + R() * 16; x.lineTo(qx, qy); } x.stroke();
+      x.fillStyle = 'rgba(0,0,0,.62)'; x.fillRect(0, 326, 480, 34);
+      x.fillStyle = '#fff'; x.font = '600 14px "IBM Plex Mono", Consolas, monospace'; x.fillText('FOTO DE EXEMPLO · ' + label.toUpperCase(), 14, 348);
+      return (fcache[key] = c.toDataURL('image/jpeg', .82));
+    }
+    function fotoSrc(f) { return f.src || exFoto(f.seed, 'Vol ' + f.vol); }
+
+    /* ---------- small renderers ---------- */
+    function platTag(r) { return '<span class="plat"><i class="dot p-' + r.plat + '"></i>' + PLAT[r.plat].nome + '</span>'; }
+    function pill(s) { return '<span class="pill pill-' + s.c + '">' + esc(s.t) + '</span>'; }
+    function prazoPill(r) { var p = prazoInfo(r); return p ? '<span class="pill pill-' + p.c + '">' + p.t + '</span>' : ''; }
+
+    /* ---------- Painel ---------- */
+    /* Stack order bottom→top = validated categorical order (Loja, Shopee, TikTok, ML). Color follows the platform everywhere. */
+    var STACK = ['lj', 'sh', 'tt', 'ml'];
+    var BRL0 = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+    function janela(days, back) { var end = dayStart(Date.now()) + DAY - (back || 0) * days * DAY; return [end - days * DAY, end]; }
+    function dentro(t, w) { return t != null && t >= w[0] && t < w[1]; }
+    function stats(w, plat) {
+      var rs = DB.filter(function (r) { return !plat || r.plat === plat; });
+      var dev = rs.filter(function (r) { return dentro(r.solicitadaEm, w); });
+      var fech = rs.filter(function (r) { return r.disputa && r.disputa.resultado && dentro(r.disputa.fechadaEm, w); });
+      var recup = 0, perd = 0, ganhas = 0;
+      fech.forEach(function (r) {
+        var D = r.disputa;
+        if (D.resultado === 'ganha') { ganhas++; recup += D.valorRecebido; perd += Math.max(0, D.valor - D.valorRecebido); }
+        else perd += D.valor;
+      });
+      return { dev: dev, n: dev.length, recup: recup, perd: perd, nFech: fech.length, nGanhas: ganhas, taxa: fech.length ? ganhas / fech.length : null };
+    }
+    function temHistorico(w) { var first = Math.min.apply(null, DB.map(function (r) { return r.solicitadaEm; })); return first <= w[0] + DAY; }
+    function delta(cur, prev, goodUp, pp) {
+      var none = '<span class="kpi-d muted">sem período anterior para comparar</span>';
+      if (prev == null || cur == null) return none;
+      var diff = pp ? Math.round((cur - prev) * 100) : (prev ? Math.round((cur - prev) / prev * 100) : null);
+      if (diff == null) return none;
+      if (diff === 0) return '<span class="kpi-d muted">igual aos ' + S.per + ' dias anteriores</span>';
+      var up = diff > 0, good = up === goodUp;
+      return '<span class="kpi-d ' + (good ? 'd-good' : 'd-bad') + '">' + (up ? '▲ ' : '▼ ') + Math.abs(diff) + (pp ? ' p.p.' : '%') +
+        ' <span class="muted">vs. ' + S.per + ' dias anteriores</span></span>';
+    }
+    function kpi(label, value, sub, cls, act) {
+      var tag = act ? 'button type="button" ' + act : 'div';
+      return '<' + tag + ' class="kpi' + (cls ? ' ' + cls : '') + '"><span class="kpi-l">' + label + '</span><span class="kpi-v">' + value + '</span>' + sub + '</' + (act ? 'button' : 'div') + '>';
+    }
+
+    function guideHtml() {
+      var d = S.done, n = (d.sync ? 1 : 0) + (d.ficha ? 1 : 0) + (d.scan ? 1 : 0) + (d.disp ? 1 : 0);
+      var st = function (k, i, html) { return '<li><button type="button" class="gstep' + (d[k] ? ' done' : '') + '" data-act="g' + i + '"><span class="gnum">' + (d[k] ? '✓' : i) + '</span><span>' + html + '</span></button></li>'; };
+      return '<details class="guide" id="guide"' + (S.guideOpen ? ' open' : '') + '><summary><span><b>Como testar a demonstração</b><span class="sub">' + n + ' de 4 passos feitos</span></span><span class="prog" aria-hidden="true"><i style="width:' + (n * 25) + '%"></i></span></summary><ol>' +
+        st('sync', 1, 'Aperte <b>Atualizar devoluções</b> para buscar as novidades') +
+        st('ficha', 2, 'Abra uma devolução com <b>prazo vencendo</b>') +
+        st('scan', 3, '<b>Receba um pacote</b> lendo a etiqueta') +
+        st('disp', 4, 'Siga os passos e <b>registre a disputa</b>') +
+        '</ol></details>';
+    }
+    function trow(r, right) {
+      return '<li><button type="button" class="trow" data-act="open" data-id="' + r.id + '"><span><b>' + esc(r.produto) + '</b><span class="sub">' + PLAT[r.plat].nome + ' · ' + r.id + '</span></span>' + (right || '') + '<span class="chev" aria-hidden="true">›</span></button></li>';
+    }
+
+    function tasksCard(risco) {
+      var g = tasks(S.dplat);
+      var TT = [
+        { k: 'disputa', items: g.disputa, tone: 'bad', icon: 'gavel', title: 'Abrir disputa', desc: 'Chegaram com problema e já têm fotos. Abra antes do prazo acabar.', f: 'pronta', right: prazoPill },
+        { k: 'conferir', items: g.conferir, tone: 'warn', icon: 'camera', title: 'Conferir', desc: 'Chegaram e ainda não foram abertos e fotografados.', f: 'recebida', right: function (r) { return status(r).k === 'parcial' ? pill(status(r)) : prazoPill(r); } },
+        { k: 'cobrar', items: g.cobrar, tone: 'info', icon: 'truck', title: 'Cobrar plataforma', desc: 'Aprovadas há mais de ' + PRAZO_CHEGADA + ' dias e ainda não chegaram.', f: 'aguardando', right: function (r) { return '<span class="pill pill-info">' + daysSince(r.aprovadaEm) + ' dias</span>'; } },
+        { k: 'estoque', items: g.estoque, tone: 'ok', icon: 'shelf', title: 'Devolver ao estoque', desc: 'Conferidas e em bom estado.', f: 'acao', right: function () { return ''; } }
+      ];
+      if (S.naoId.length) TT.push({ k: 'naoid', items: S.naoId, tone: 'info', icon: 'q', title: 'Não identificados', desc: 'Pacotes bipados sem devolução correspondente. Vincule ao pedido certo.' });
+      var total = TT.reduce(function (s, t) { return s + t.items.length; }, 0);
+      var html = '<section class="card"><div class="card-h"><h2>O que fazer hoje</h2><span class="hint">' + plural(total, 'tarefa', 'tarefas') + '</span></div>';
+      if (!total) return html + '<p class="allgood">' + icon('checkc') + ' Tudo em dia. Nenhuma tarefa pendente.</p></section>';
+      var act = TT.filter(function (t) { return t.k === S.ttab && t.items.length; })[0] || TT.filter(function (t) { return t.items.length; })[0];
+      html += '<div class="ttabs" role="tablist" aria-label="Tipo de tarefa">' + TT.map(function (t) {
+        var on = t === act;
+        return '<button type="button" role="tab" class="ttab" aria-selected="' + on + '" data-act="ttab" data-t="' + t.k + '"' + (t.items.length ? '' : ' disabled') + '>' +
+          '<span class="tt-ic tone-' + t.tone + '">' + icon(t.icon) + '</span><span class="tt-t">' + t.title + '</span><b>' + t.items.length + '</b></button>';
+      }).join('') + '</div>';
+      html += '<div role="tabpanel"><p class="hint">' + act.desc + '</p>';
+      if (act.k === 'naoid') {
+        html += '<ul class="tlist">' + S.naoId.map(function (p) { return '<li><button type="button" class="trow" data-act="nav" data-v="receber"><span><b class="mono">' + esc(p.codigo) + '</b><span class="sub">Recebido ' + quando(p.em) + '</span></span><span></span><span class="chev" aria-hidden="true">›</span></button></li>'; }).join('') + '</ul>';
+      } else {
+        html += '<ul class="tlist">' + act.items.slice(0, 5).map(function (r) { return trow(r, act.right(r)); }).join('') + '</ul>';
+        if (act.k === 'disputa' && risco) html += '<p class="risk">' + icon('warn') + ' ' + money(risco) + ' podem ser perdidos se o prazo vencer</p>';
+        if (act.items.length > 5) html += '<button type="button" class="linkbtn" data-act="filter" data-f="' + act.f + '">Ver todas as ' + act.items.length + '</button>';
+      }
+      return html + '</div></section>';
+    }
+
+    /* Chart data: daily buckets for 7 days, rolling weeks otherwise */
+    function chartData() {
+      var daily = S.per === 7, n = daily ? 7 : Math.ceil(S.per / 7), step = daily ? DAY : 7 * DAY;
+      var end0 = dayStart(Date.now()) + DAY, rows = [];
+      var plats = S.dplat ? [S.dplat] : STACK;
+      for (var i = n - 1; i >= 0; i--) {
+        var e = end0 - i * step, s = e - step;
+        var vals = plats.map(function (p) { return DB.filter(function (r) { return r.plat === p && r.solicitadaEm >= s && r.solicitadaEm < e; }).length; });
+        var wd = new Date(s).toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '');
+        rows.push({
+          s: s, e: e, vals: vals, total: vals.reduce(function (a, b) { return a + b; }, 0),
+          label: daily ? wd + ' ' + new Date(s).getDate() : ddmm(s),
+          long: daily ? new Date(s).toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }) : 'Semana de ' + ddmm(s) + ' a ' + ddmm(e - DAY)
+        });
+      }
+      return { plats: plats, rows: rows, daily: daily };
+    }
+    function niceStep(max) { var raw = max / 4, p = Math.pow(10, Math.floor(Math.log10(raw || 1))), f = raw / p; return Math.max(1, (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p); }
+    function chartTableHtml() {
+      var cd = chartData(), multi = cd.plats.length > 1;
+      return '<div class="tbl"><table><thead><tr><th>' + (cd.daily ? 'Dia' : 'Semana') + '</th>' + cd.plats.slice().reverse().map(function (p) { return '<th class="num">' + PLAT[p].nome + '</th>'; }).join('') + (multi ? '<th class="num">Total</th>' : '') + '</tr></thead><tbody>' +
+        cd.rows.map(function (r) {
+          return '<tr><td>' + esc(r.long) + '</td>' + r.vals.slice().reverse().map(function (v) { return '<td class="num">' + v + '</td>'; }).join('') + (multi ? '<td class="num"><b>' + r.total + '</b></td>' : '') + '</tr>';
+        }).join('') + '</tbody></table></div>';
+    }
+    function drawChart() {
+      var host = $('#chartWeekly'); if (!host) return;
+      host.classList.remove('hovering');
+      var cd = chartData(), rows = cd.rows, plats = cd.plats;
+      var W = Math.max(280, Math.floor(host.clientWidth || 600)), H = 250;
+      var endLabels = plats.length > 1 && W >= 560;
+      var m = { t: 22, r: endLabels ? 104 : 8, b: 30, l: 32 };
+      var pw = W - m.l - m.r, ph = H - m.t - m.b;
+      var totals = rows.map(function (r) { return r.total; });
+      var max = Math.max.apply(null, [1].concat(totals)), step = niceStep(max), yMax = Math.ceil(max / step) * step;
+      var y = function (v) { return m.t + ph - v / yMax * ph; };
+      var band = pw / rows.length, bw = Math.min(24, band * 0.6);
+      var maxI = totals.indexOf(Math.max.apply(null, totals)), lastI = rows.length - 1;
+      var every = band < 38 ? 2 : 1;
+      var f = function (v) { return Math.round(v * 10) / 10; };
+      var svg = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Gráfico de colunas: devoluções pedidas por ' + (cd.daily ? 'dia' : 'semana') + '. Use Ver como tabela para os números.">';
+      for (var v = 0; v <= yMax; v += step) {
+        svg += '<line class="' + (v === 0 ? 'base' : 'gl') + '" x1="' + m.l + '" x2="' + (W - m.r) + '" y1="' + f(y(v)) + '" y2="' + f(y(v)) + '"/>' +
+          '<text class="ax" x="' + (m.l - 8) + '" y="' + f(y(v) + 4) + '" text-anchor="end">' + v + '</text>';
+      }
+      var lastSegs = [];
+      rows.forEach(function (r, i) {
+        var cx = m.l + band * i + band / 2, x0 = f(cx - bw / 2), acc = 0, segs = [];
+        r.vals.forEach(function (val, j) { if (val > 0) segs.push([j, acc, acc + val]); acc += val; });
+        svg += '<g class="col" data-i="' + i + '">';
+        segs.forEach(function (sg, k) {
+          var top = k === segs.length - 1, yb = y(sg[1]), yt = y(sg[2]);
+          if (k > 0) yb -= 1;          /* 2px surface gap between stacked segments */
+          if (!top) yt += 1;
+          var h = Math.max(0, yb - yt), cls = 'c-' + plats[sg[0]];
+          if (top) {
+            var rr = Math.min(4, h, bw / 2);
+            svg += '<path class="' + cls + '" d="M' + x0 + ',' + f(yb) + 'V' + f(yt + rr) + 'Q' + x0 + ',' + f(yt) + ' ' + f(x0 + rr) + ',' + f(yt) + 'H' + f(x0 + bw - rr) + 'Q' + f(x0 + bw) + ',' + f(yt) + ' ' + f(x0 + bw) + ',' + f(yt + rr) + 'V' + f(yb) + 'Z"/>';
+          } else svg += '<rect class="' + cls + '" x="' + x0 + '" y="' + f(yt) + '" width="' + f(bw) + '" height="' + f(h) + '"/>';
+          if (i === lastI) lastSegs.push({ p: plats[sg[0]], mid: (yb + yt) / 2, h: h, x: x0 + bw });
+        });
+        if (r.total && (rows.length <= 8 || i === maxI || i === lastI)) svg += '<text class="cap" x="' + f(cx) + '" y="' + f(y(r.total) - 7) + '" text-anchor="middle">' + r.total + '</text>';
+        svg += '</g>';
+        if ((lastI - i) % every === 0) svg += '<text class="ax" x="' + f(cx) + '" y="' + (H - m.b + 18) + '" text-anchor="middle">' + r.label + '</text>';
+      });
+      if (endLabels) lastSegs.forEach(function (sg) { if (sg.h >= 13) svg += '<text class="el" x="' + f(sg.x + 8) + '" y="' + f(sg.mid + 4) + '">' + PLAT[sg.p].nome + '</text>'; });
+      rows.forEach(function (r, i) {
+        svg += '<rect class="hit" data-i="' + i + '" x="' + f(m.l + band * i) + '" y="' + m.t + '" width="' + f(band) + '" height="' + ph + '" tabindex="0" aria-label="' + esc(r.long) + ': ' + plural(r.total, 'devolução', 'devoluções') + '"/>';
+      });
+      host.innerHTML = svg + '</svg><div class="ctip" hidden></div>';
+      var tip = host.querySelector('.ctip');
+      function show(i) {
+        var r = rows[i];
+        host.classList.add('hovering');
+        host.querySelectorAll('.col').forEach(function (g) { g.classList.toggle('on', +g.dataset.i === i); });
+        tip.textContent = '';
+        var hd = document.createElement('div'); hd.className = 'ct-h'; hd.textContent = r.long; tip.appendChild(hd);
+        plats.slice().reverse().forEach(function (p) {
+          var row = document.createElement('div'); row.className = 'ct-r';
+          var k = document.createElement('span'); k.className = 'ct-k p-' + p;
+          var b = document.createElement('b'); b.textContent = r.vals[plats.indexOf(p)];
+          var nm = document.createElement('span'); nm.className = 'muted'; nm.textContent = PLAT[p].nome;
+          row.appendChild(k); row.appendChild(b); row.appendChild(nm); tip.appendChild(row);
+        });
+        if (plats.length > 1) { var tt = document.createElement('div'); tt.className = 'ct-t'; tt.textContent = 'Total: ' + plural(r.total, 'devolução', 'devoluções'); tip.appendChild(tt); }
+        tip.hidden = false;
+        var cx = m.l + band * i + band / 2, tw = tip.offsetWidth, left = cx + 16;
+        if (left + tw > W) left = cx - 16 - tw;
+        tip.style.left = Math.max(0, left) + 'px'; tip.style.top = m.t + 'px';
+      }
+      function hide() { host.classList.remove('hovering'); tip.hidden = true; }
+      host.querySelectorAll('.hit').forEach(function (el) {
+        var i = +el.dataset.i;
+        el.addEventListener('pointerenter', function () { show(i); });
+        el.addEventListener('click', function () { show(i); });
+        el.addEventListener('focus', function () { show(i); });
+        el.addEventListener('pointerleave', hide);
+        el.addEventListener('blur', hide);
+      });
+    }
+
+    function vPainel() {
+      var w = janela(S.per), wPrev = janela(S.per, 1), hasPrev = temHistorico(wPrev);
+      var st = stats(w, S.dplat), sp = hasPrev ? stats(wPrev, S.dplat) : null;
+      var riscoRs = DB.filter(function (r) { if (S.dplat && r.plat !== S.dplat) return false; var p = prazoInfo(r); return p && p.left <= 2; });
+      var risco = riscoRs.reduce(function (s, r) { return s + r.valor; }, 0);
+      var cnt = function (k) { return DB.filter(function (r) { return (!S.dplat || r.plat === S.dplat) && match(r, k); }).length; };
+      var h = new Date().getHours();
+      var saud = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+      var hoje = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+      var platNome = S.dplat ? PLAT[S.dplat].nome : 'todas as plataformas';
+
+      var html = '<div class="view">';
+      html += '<div class="page-h"><div><p class="eyebrow">' + esc(hoje) + '</p><h1>' + saud + '</h1><p class="muted" style="margin-top:4px">Plataformas atualizadas ' + quando(S.lastSync) + '</p></div>' +
+        '<button type="button" class="btn btn-primary btn-lg" data-act="sync"' + (S.syncing ? ' disabled' : '') + '>' + (S.syncing ? '<span class="spin" aria-hidden="true"></span> Buscando nas plataformas…' : icon('refresh') + ' Atualizar devoluções') + '</button></div>';
+      html += guideHtml();
+
+      /* One filter row, scoping everything below */
+      html += '<div class="dfilters"><div class="seg" role="group" aria-label="Período">' + [7, 30, 90].map(function (p) {
+        return '<button type="button" class="segb' + (S.per === p ? ' on' : '') + '" data-act="per" data-p="' + p + '" aria-pressed="' + (S.per === p) + '">' + p + ' dias</button>';
+      }).join('') + '</div><label class="vh" for="dplat">Plataforma</label><select id="dplat"><option value="">Todas as plataformas</option>' +
+        Object.keys(PLAT).map(function (p) { return '<option value="' + p + '"' + (S.dplat === p ? ' selected' : '') + '>' + PLAT[p].nome + '</option>'; }).join('') + '</select></div>';
+
+      /* KPI row */
+      html += '<div class="kpis">' +
+        kpi('Devoluções pedidas', String(st.n), delta(st.n, sp && sp.n, false)) +
+        kpi('Recuperado em disputas', BRL0.format(st.recup), delta(st.recup, sp && sp.recup, true)) +
+        kpi('Disputas ganhas', st.taxa == null ? '–' : Math.round(st.taxa * 100) + '%',
+          '<span class="kpi-d muted">' + st.nGanhas + ' de ' + st.nFech + ' encerradas</span>' + (sp && sp.taxa != null && st.taxa != null ? delta(st.taxa, sp.taxa, true, true) : '')) +
+        kpi('Em risco agora', BRL0.format(risco),
+          '<span class="kpi-d' + (risco ? ' d-bad' : ' muted') + '">' + (risco ? icon('warn') + ' ' + plural(riscoRs.length, 'devolução', 'devoluções') + ' com prazo em até 2 dias' : 'Nenhum prazo apertado') + '</span>',
+          risco ? 'kpi-risk' : '', 'data-act="filter" data-f="acao"') +
+        '</div>';
+
+      /* Tasks + current state */
+      var recent = st.dev;
+      var nApr = recent.filter(function (r) { return r.statusPlat === 'aprovada'; }).length;
+      var nAna = recent.filter(function (r) { return r.statusPlat === 'analise'; }).length;
+      var nRec = recent.filter(function (r) { return r.statusPlat === 'recusada'; }).length;
+      var PIPE = [['aguardando', 'A caminho', 'aprovadas, ainda não chegaram'], ['recebida', 'Falta conferir', 'chegaram, sem fotos'], ['pronta', 'Abrir disputa', 'com fotos, sem disputa'], ['disputa', 'Em disputa', 'aguardando a plataforma']];
+      html += '<div class="dgrid">' + tasksCard(risco) + '<div class="col">' +
+        '<section class="card"><div class="card-h"><h2>Nas plataformas</h2><span class="hint">pedidos em ' + S.per + ' dias</span></div><div class="sum3">' +
+        '<button type="button" class="sum ok" data-act="filter" data-f="aprovada"><span class="sum-n">' + nApr + '</span><span class="sum-l">Aprovadas</span></button>' +
+        '<button type="button" class="sum" data-act="filter" data-f="plat-analise"><span class="sum-n">' + nAna + '</span><span class="sum-l">Em análise</span></button>' +
+        '<button type="button" class="sum bad" data-act="filter" data-f="plat-recusada"><span class="sum-n">' + nRec + '</span><span class="sum-l">Recusadas</span></button></div></section>' +
+        '<section class="card"><div class="card-h"><h2>Onde estão agora</h2></div><ul class="pipe">' + PIPE.map(function (p) {
+          return '<li><button type="button" data-act="filter" data-f="' + p[0] + '"><span><b>' + p[1] + '</b><span class="sub">' + p[2] + '</span></span><span class="pipe-n">' + cnt(p[0]) + '</span><span class="chev" aria-hidden="true">›</span></button></li>';
+        }).join('') + '</ul></section></div></div>';
+
+      /* Chart */
+      var legend = '';
+      if (!S.dplat) {
+        legend = '<ul class="legend" aria-label="Legenda">' + STACK.slice().reverse().map(function (p) {
+          var n = st.dev.filter(function (r) { return r.plat === p; }).length;
+          return '<li><span class="lg-sw p-' + p + '"></span>' + PLAT[p].nome + ' <b>' + n + '</b></li>';
+        }).join('') + '</ul>';
+      }
+      html += '<section class="card"><div class="card-h"><div><h2>Devoluções pedidas por ' + (S.per === 7 ? 'dia' : 'semana') + '</h2><span class="sub">' + (S.dplat ? PLAT[S.dplat].nome : 'Por plataforma') + ' · últimos ' + S.per + ' dias</span></div>' +
+        '<button type="button" class="linkbtn" data-act="chartTable">' + (S.chartTable ? 'Ver gráfico' : 'Ver como tabela') + '</button></div>' + legend +
+        (S.chartTable ? chartTableHtml() : '<div class="chart" id="chartWeekly"></div>') + '</section>';
+
+      /* Reasons + platform comparison */
+      var mot = {};
+      st.dev.forEach(function (r) { mot[r.motivo] = (mot[r.motivo] || 0) + 1; });
+      var ml = Object.keys(mot).map(function (k) { return [k, mot[k]]; }).sort(function (a, b) { return b[1] - a[1]; });
+      var mm = ml.length ? ml[0][1] : 1;
+      var motHtml = '<section class="card"><div class="card-h"><h2>Por que devolvem</h2><span class="hint">motivo informado pelo cliente</span></div>';
+      if (!ml.length) motHtml += '<p class="muted">Nenhuma devolução no período.</p>';
+      else {
+        motHtml += '<ul class="mbars">' + ml.map(function (m) {
+          return '<li><span class="mb-l">' + esc(m[0]) + '</span><span class="mb-v">' + m[1] + ' <span class="muted">· ' + Math.round(m[1] / st.n * 100) + '%</span></span><span class="mb-t"><span class="mb-f" style="width:' + (m[1] / mm * 100) + '%"></span></span></li>';
+        }).join('') + '</ul>';
+        var av = mot['Produto chegou avariado'] || 0;
+        if (av / st.n >= 0.4) motHtml += '<p class="insight">' + icon('warn') + '<span><b>' + Math.round(av / st.n * 100) + '% chegaram avariados.</b> Vale revisar a embalagem e a transportadora: é a maior causa de devolução.</span></p>';
+      }
+      motHtml += '</section>';
+      var pl = S.dplat ? [S.dplat] : ['ml', 'sh', 'tt', 'lj'];
+      var cmp = '<section class="card"><div class="card-h"><h2>Comparativo por plataforma</h2><span class="hint">últimos ' + S.per + ' dias</span></div><div class="tbl"><table><thead><tr><th>Plataforma</th><th class="num">Devoluções</th><th class="num">Recuperado</th><th class="num">Ganhas</th></tr></thead><tbody>' +
+        pl.map(function (p) {
+          var s = stats(w, p);
+          return '<tr><td><span class="plat"><i class="dot p-' + p + '"></i>' + PLAT[p].nome + '</span></td><td class="num">' + s.n + '</td><td class="num">' + BRL0.format(s.recup) + '</td><td class="num">' + (s.taxa == null ? '–' : Math.round(s.taxa * 100) + '%') + '</td></tr>';
+        }).join('') + '</tbody></table></div><p class="hint">Recuperado e ganhas contam as disputas encerradas no período.</p></section>';
+      html += '<div class="duo">' + motHtml + cmp + '</div>';
+      return html + '</div>';
+    }
+
+    /* ---------- Lista ---------- */
+    var FILTROS = [['acao', 'Fazer agora'], ['aguardando', 'A caminho'], ['recebida', 'Falta conferir'], ['pronta', 'Abrir disputa'], ['disputa', 'Em disputa'], ['encerrada', 'Encerradas'], ['analise', 'Em análise'], ['todas', 'Todas']];
+    var EXTRA_F = { aprovada: 'Aprovadas na plataforma', 'plat-analise': 'Em análise na plataforma', 'plat-recusada': 'Recusadas na plataforma', recusada: 'Recusadas' };
+    function rowsHtml() {
+      var q = S.q.trim().toLowerCase();
+      var list = DB.filter(function (r) {
+        if (!match(r, S.filtro)) return false;
+        if (S.plat && r.plat !== S.plat) return false;
+        if (q) {
+          var hay = (r.id + ' ' + r.pedido + ' ' + r.produto + ' ' + r.volumes.map(function (v) { return v.codigo; }).join(' ')).toLowerCase();
+          if (hay.indexOf(q) < 0) return false;
+        }
+        return true;
+      });
+      list.sort(function (a, b) {
+        var pa = prazoInfo(a), pb = prazoInfo(b);
+        var ua = pa && pa.left <= 2 ? pa.left : 99, ub = pb && pb.left <= 2 ? pb.left : 99;
+        return ua - ub || lastAct(b) - lastAct(a);
+      });
+      if (!list.length) return '<p class="empty">Nenhuma devolução aqui.' + (S.q || S.plat ? ' Tente limpar a busca ou a plataforma.' : '') + '</p>';
+      return list.map(function (r) {
+        var s = status(r), p = prazoInfo(r), nx = nextStepTxt(r);
+        var cls = p && p.c !== 'muted' ? ' t-' + p.c : (atrasada(r) ? ' t-warn' : '');
+        return '<button type="button" class="row" data-act="open" data-id="' + r.id + '">' +
+          '<span class="r-main"><b>' + esc(r.produto) + '</b>' + (r.novo ? '<span class="new">Nova</span>' : '') + '<span class="sub">' + r.id + ' · Pedido ' + esc(r.pedido) + ' · ' + plural(r.volumes.length, 'volume', 'volumes') + '</span></span>' +
+          '<span class="r-plat">' + platTag(r) + '</span>' +
+          '<span class="r-st">' + pill(s) + (nx ? '<span class="r-next' + cls + '">' + esc(nx) + (p && p.c !== 'muted' ? ' · ' + p.t.toLowerCase() : '') + '</span>' : '') + '</span>' +
+          '<span class="r-val">' + money(r.valor) + '</span></button>';
+      }).join('');
+    }
+    function vLista() {
+      var html = '<div class="view"><div class="page-h"><div><h1>Devoluções</h1><p class="muted" style="margin-top:4px">Toque numa devolução para ver os detalhes e o próximo passo.</p></div></div>';
+      html += '<div class="filters"><div class="chips" role="toolbar" aria-label="Filtrar por etapa">';
+      if (EXTRA_F[S.filtro]) html += '<button type="button" class="chip on" data-act="filter" data-f="todas" aria-label="Remover filtro ' + EXTRA_F[S.filtro] + '">' + EXTRA_F[S.filtro] + ' ×</button>';
+      html += FILTROS.map(function (f) {
+        var n = DB.filter(function (r) { return match(r, f[0]); }).length;
+        return '<button type="button" class="chip' + (S.filtro === f[0] ? ' on' : '') + '" data-act="filter" data-f="' + f[0] + '" aria-pressed="' + (S.filtro === f[0]) + '">' + f[1] + ' <span class="chip-n">' + n + '</span></button>';
+      }).join('') + '</div>';
+      html += '<div class="filter-row"><label class="vh" for="q">Buscar</label><input id="q" type="search" placeholder="Buscar por pedido, produto ou código" value="' + esc(S.q) + '">' +
+        '<label class="vh" for="pf">Plataforma</label><select id="pf"><option value="">Todas as plataformas</option>' +
+        Object.keys(PLAT).map(function (p) { return '<option value="' + p + '"' + (S.plat === p ? ' selected' : '') + '>' + PLAT[p].nome + '</option>'; }).join('') + '</select></div></div>';
+      html += '<div class="rows" id="rows">' + rowsHtml() + '</div></div>';
+      return html;
+    }
+
+    /* ---------- Ficha ---------- */
+    function dispText(r) {
+      var recs = r.volumes.filter(function (v) { return v.recebidoEm; }).map(function (v) { return v.recebidoEm; });
+      var t = recs.length ? Math.max.apply(null, recs) : Date.now();
+      return 'Pedido ' + r.pedido + ' (' + PLAT[r.plat].nome + '). Recebemos a devolução em ' + ddmm(t) + ' e, na conferência, o produto "' + r.produto + '" apresentou o seguinte problema: ' + COND[r.condicao].toLowerCase() + '.' +
+        (r.obs ? ' ' + r.obs : '') + ' Seguem ' + plural(r.fotos.length, 'foto tirada', 'fotos tiradas') + ' no momento do recebimento como evidência. Solicitamos o reembolso de ' + money(r.valor) + '.';
+    }
+    function stepper(r) {
+      var k = status(r).k;
+      var recs = r.volumes.filter(function (v) { return v.recebidoEm; });
+      var all = recs.length === r.volumes.length;
+      var closed = CLOSED.indexOf(k) >= 0;
+      var S0 = r.statusPlat === 'aprovada' ? 'done' : r.statusPlat === 'recusada' ? 'bad' : 'cur';
+      var steps = [
+        { l: r.statusPlat === 'recusada' ? 'Recusada' : r.statusPlat === 'analise' ? 'Em análise' : 'Aprovada', d: r.aprovadaEm || r.recusadaEm, st: S0 },
+        { l: recs.length && !all ? 'Chegou ' + recs.length + '/' + r.volumes.length : 'Chegou', d: all && recs.length ? recebCompleto(r) : null, st: all ? 'done' : (S0 === 'done' ? 'cur' : 'todo') },
+        { l: 'Conferida', d: r.inspecionadaEm, st: r.condicao ? 'done' : (recs.length ? 'cur' : 'todo') },
+        { l: r.estoque ? 'Sem disputa' : 'Disputa', d: r.disputa ? r.disputa.abertaEm : null, st: r.estoque ? 'skip' : r.disputa ? (r.disputa.resultado ? 'done' : 'cur') : (r.condicao && r.condicao !== 'ok' ? 'cur' : (r.condicao === 'ok' ? 'skip' : 'todo')) },
+        { l: 'Encerrada', d: closed ? (r.disputa && r.disputa.fechadaEm) || r.encerradaEm : null, st: closed ? 'done' : 'todo' }
+      ];
+      return '<ol class="steps" aria-label="Etapas da devolução">' + steps.map(function (s, i) {
+        var inner = s.st === 'done' ? icon('check') : s.st === 'bad' ? '×' : s.st === 'skip' ? '–' : String(i + 1);
+        return '<li class="st-' + s.st + '"' + (s.st === 'cur' ? ' aria-current="step"' : '') + '><span class="sc">' + inner + '</span><span class="sl">' + s.l + '</span>' + (s.d ? '<span class="sd">' + curto(s.d) + '</span>' : '') + '</li>';
+      }).join('') + '</ol>';
+    }
+    function nextCard(r) {
+      var s = status(r), k = s.k, p = prazoInfo(r);
+      var faltam = r.volumes.filter(function (v) { return !v.recebidoEm; }).length;
+      var plat = PLAT[r.plat].nome;
+      var head = function (title, desc, side) { return '<div class="next-h"><div><p class="eyebrow">Próximo passo</p><h2>' + esc(title) + '</h2>' + (desc ? '<p class="muted">' + esc(desc) + '</p>' : '') + '</div>' + (side || '') + '</div>'; };
+      var bInsp = '<button type="button" class="btn btn-primary btn-lg" data-act="gotoInsp" data-id="' + r.id + '">' + icon('camera') + ' Conferir e fotografar</button>';
+      var bRecv = '<button type="button" class="btn btn-primary" data-act="nav" data-v="receber">' + icon('scan') + ' Ir para Receber pacote</button>';
+      switch (k) {
+        case 'analise': return '<div class="next">' + head('Aguardar a plataforma', 'O pedido de devolução ainda está em análise no ' + plat + '. Nada a fazer por enquanto.') + '</div>';
+        case 'recusada': return '<div class="next">' + head('Nada a fazer', 'O ' + plat + ' recusou esta devolução. Se o pacote chegar mesmo assim, bipe normalmente em Receber pacote.') + '</div>';
+        case 'aguardando':
+          if (atrasada(r)) return '<div class="next next-warn">' + head('Cobrar a plataforma', 'Aprovada há ' + daysSince(r.aprovadaEm) + ' dias e o pacote ainda não chegou. Vale abrir um chamado no ' + plat + '.') + '</div>';
+          return '<div class="next">' + head('Aguardar o pacote chegar', 'Quando chegar, bipe a etiqueta em Receber pacote.') + '<div class="btns">' + bRecv + '</div></div>';
+        case 'parcial': return '<div class="next next-warn">' + head('Chegou em parte: ' + (faltam === 1 ? 'falta 1 volume' : 'faltam ' + faltam + ' volumes'), 'Dá para conferir os volumes que já chegaram.') + '<div class="btns">' + bInsp.replace(' btn-lg', '') + '</div></div>';
+        case 'recebida': return '<div class="next ' + (p && p.c !== 'muted' ? 'next-' + p.c : 'next-warn') + '">' + head('Conferir e fotografar', 'Abra o pacote, veja se o produto chegou bem e tire as fotos. Elas são a prova da disputa.', prazoPill(r)) + '<div class="btns">' + bInsp + '</div></div>';
+        case 'inspecionada':
+          if (r.condicao === 'ok') return '<div class="next next-ok">' + head('Devolver ao estoque', 'O produto chegou em bom estado. Não precisa abrir disputa.') + '<div class="btns"><button type="button" class="btn btn-primary" data-act="estoque" data-id="' + r.id + '">' + icon('shelf') + ' Devolver ao estoque e encerrar</button></div></div>';
+          var html = '<div class="next ' + (p && p.c !== 'muted' ? 'next-' + p.c : 'next-accent') + '">' + head('Abrir disputa no ' + plat, (p ? (p.left < 0 ? 'O prazo já venceu, mas ainda vale tentar.' : p.left === 0 ? 'O prazo vence hoje.' : 'Você tem ' + plural(p.left, 'dia', 'dias') + ' para abrir.') + ' ' : '') + 'Siga os 4 passos:', prazoPill(r));
+          html += '<ol class="dsteps">' +
+            '<li><span><b>Baixe as fotos</b><span class="sub">' + plural(r.fotos.length, 'foto tirada', 'fotos tiradas') + ' na conferência</span></span><button type="button" class="btn" data-act="zip" data-id="' + r.id + '">' + icon('download') + ' Baixar fotos</button></li>' +
+            '<li><span><b>Copie o texto pronto</b><span class="sub">Já vem com pedido, data e problema</span></span><button type="button" class="btn" data-act="copyTxt" data-id="' + r.id + '">' + icon('copy') + ' Copiar texto</button></li>' +
+            '<li class="wide"><span><b>Abra a disputa no site do ' + plat + '</b><span class="sub">Anexe as fotos e cole o texto</span></span></li>' +
+            '<li class="wide"><span><b>Anote aqui o número do protocolo</b><span class="sub">O ' + plat + ' mostra esse número depois que a disputa é aberta</span></span>' +
+            '<form id="dispForm" class="inrow" autocomplete="off"><label class="vh" for="fProt">Número do protocolo</label><input type="text" id="fProt" placeholder="Ex.: MED-48812093"><button class="btn btn-primary" type="submit">Salvar</button></form></li>' +
+            '</ol>';
+          if (S.txtFallback === r.id) html += '<label class="lbl" for="txtFb">Texto da disputa (selecione e copie)</label><textarea id="txtFb" rows="5" readonly>' + esc(dispText(r)) + '</textarea>';
+          return html + '</div>';
+        case 'disputa':
+          var f = S.form;
+          var out = '<div class="next">' + head('Aguardar resposta do ' + plat, 'Disputa aberta ' + quando(r.disputa.abertaEm) + ' · protocolo ' + r.disputa.protocolo + '. Quando a plataforma responder, registre o resultado.') +
+            '<div class="btns"><button type="button" class="btn' + (f === 'ganha' ? ' on' : '') + '" data-act="res" data-r="ganha">' + icon('checkc') + ' Ganhamos</button><button type="button" class="btn' + (f === 'perdida' ? ' on' : '') + '" data-act="res" data-r="perdida">' + icon('x') + ' Perdemos</button></div>';
+          if (f === 'ganha') out += '<form id="resForm" data-r="ganha" class="inrow" autocomplete="off"><label class="vh" for="fRec">Valor reembolsado</label><input type="text" id="fRec" inputmode="decimal" value="' + num(r.disputa.valor) + '" aria-describedby="fRecH"><button class="btn btn-primary" type="submit">Salvar</button></form><p class="hint" id="fRecH">Valor que a plataforma reembolsou, em reais. Pode ser parcial.</p>';
+          if (f === 'perdida') out += '<form id="resForm" data-r="perdida" class="inrow" autocomplete="off"><label class="vh" for="fMot">Motivo</label><input type="text" id="fMot" placeholder="Motivo. Ex.: fotos não aceitas"><button class="btn btn-primary" type="submit">Salvar</button></form>';
+          return out + '</div>';
+        case 'ganha': return '<div class="next next-ok">' + head('Reembolso de ' + money(r.disputa.valorRecebido) + ' recebido', r.disputa.valorRecebido < r.disputa.valor ? 'Reembolso parcial: foram pedidos ' + money(r.disputa.valor) + '. Devolução encerrada.' : 'Devolução encerrada.') + '</div>';
+        case 'perdida': return '<div class="next next-bad">' + head('Disputa perdida', r.disputa.motivoPerda + '. Devolução encerrada.') + '</div>';
+        case 'estoque': return '<div class="next next-ok">' + head('Voltou ao estoque', 'Devolução encerrada sem disputa.') + '</div>';
+      }
+      return '';
+    }
+    function vFicha() {
+      var r = byId(S.id); if (!r) { S.view = 'painel'; return vPainel(); }
+      var s = status(r);
+      var html = '<div class="view"><button type="button" class="back" data-act="back">' + icon('back') + ' Voltar</button>';
+      html += '<div><p class="eyebrow">' + r.id + ' · Pedido ' + esc(r.pedido) + '</p><h1>' + esc(r.produto) + '</h1><div class="meta-row" style="margin-top:10px">' + platTag(r) + pill(s) + '<span>' + money(r.valor) + '</span><span class="muted">' + plural(r.volumes.length, 'volume', 'volumes') + '</span></div></div>';
+      html += '<section class="card">' + stepper(r) + '</section>';
+      html += '<div class="grid2"><div class="col">';
+      html += nextCard(r);
+      /* Conferência */
+      var cf = '<section class="card"><div class="card-h"><h2>Conferência e fotos</h2>';
+      if (r.condicao) cf += '<span class="pill ' + (r.condicao === 'ok' ? 'pill-ok' : 'pill-bad') + '">' + COND[r.condicao] + '</span>';
+      cf += '</div>';
+      if (!r.condicao) cf += '<p class="muted">' + (r.volumes.some(function (v) { return v.recebidoEm; }) ? 'Ainda não conferido.' : 'O pacote ainda não chegou.') + '</p>';
+      else {
+        cf += '<p class="hint">Conferido ' + quando(r.inspecionadaEm) + '</p>';
+        if (r.obs) cf += '<p>' + esc(r.obs) + '</p>';
+        if (r.fotos.length) cf += '<div class="photos">' + r.fotos.map(function (f, i) { return '<figure class="ph"><img src="' + fotoSrc(f) + '" alt="Foto ' + (i + 1) + ', volume ' + f.vol + '"><figcaption>Vol ' + f.vol + '</figcaption></figure>'; }).join('') + '</div>';
+        if (s.k === 'inspecionada') cf += '<div><button type="button" class="linkbtn" data-act="gotoInsp" data-id="' + r.id + '">Refazer a conferência</button></div>';
+      }
+      html += cf + '</section>';
+      html += '<section class="card"><h2>Volumes (caixas)</h2><ul class="vols">' + r.volumes.map(function (v) {
+        return '<li><span class="vbox' + (v.recebidoEm ? ' ok' : '') + '">' + v.n + '/' + r.volumes.length + '</span><span><span class="mono">' + v.codigo + '</span><span class="sub">' + (v.recebidoEm ? 'Chegou ' + quando(v.recebidoEm) + ' · ' + esc(v.por) : 'Ainda não chegou') + '</span></span>' +
+          (v.recebidoEm ? '<span class="pill pill-ok">Chegou</span>' : '<span class="pill pill-muted">Aguardando</span>') + '</li>';
+      }).join('') + '</ul></section>';
+      html += '</div><div class="col">';
+      html += '<section class="card"><h2>Dados do pedido</h2><dl class="kv">' +
+        '<dt>Plataforma</dt><dd>' + PLAT[r.plat].nome + '</dd>' +
+        '<dt>Pedido</dt><dd class="mono">' + esc(r.pedido) + '</dd>' +
+        '<dt>Motivo do cliente</dt><dd>' + esc(r.motivo) + '</dd>' +
+        '<dt>Pedido em</dt><dd>' + quando(r.solicitadaEm) + '</dd>' +
+        '<dt>Valor</dt><dd>' + money(r.valor) + '</dd>' +
+        (r.disputa ? '<dt>Protocolo</dt><dd class="mono">' + esc(r.disputa.protocolo) + '</dd>' : '') +
+        '<dt>Prazo da disputa</dt><dd>' + PLAT[r.plat].prazo + ' dias depois que chega <span class="muted">(exemplo)</span></dd>' +
+        '</dl></section>';
+      var tl = r.timeline.slice().sort(function (x, y) { return y.t - x.t; });
+      html += '<section class="card"><h2>Histórico</h2><ol class="tl">' + tl.map(function (e) { return '<li>' + esc(e.txt) + '<span class="when">' + quando(e.t) + ' · ' + esc(e.por) + '</span></li>'; }).join('') + '</ol></section>';
+      return html + '</div></div></div>';
+    }
+
+    /* ---------- Conferência (inspeção) ---------- */
+    function photosEdit() {
+      var d = S.draft;
+      return d.fotos.map(function (f, i) {
+        return '<figure class="ph"><img src="' + fotoSrc(f) + '" alt="Foto ' + (i + 1) + ', volume ' + f.vol + '"><figcaption>Vol ' + f.vol + '</figcaption><button type="button" class="ph-x" data-act="rmFoto" data-i="' + i + '" aria-label="Remover foto ' + (i + 1) + '">×</button></figure>';
+      }).join('') +
+        '<label class="addph main" for="fileIn"><input type="file" id="fileIn" class="vh" accept="image/*" capture="environment" multiple>' + icon('camera') + '<span>Tirar foto</span></label>' +
+        '<button type="button" class="addph" data-act="exFoto">' + icon('image') + '<span>Usar foto de exemplo</span></button>';
+    }
+    function vInsp() {
+      var r = byId(S.id), d = S.draft;
+      if (!r || !d) { S.view = 'painel'; return vPainel(); }
+      var rec = r.volumes.filter(function (v) { return v.recebidoEm; });
+      var q = 0;
+      var html = '<div class="view"><button type="button" class="back" data-act="cancelInsp">' + icon('back') + ' Cancelar</button>';
+      html += '<div><p class="eyebrow">' + PLAT[r.plat].nome + ' · ' + r.id + '</p><h1>Conferir e fotografar</h1><p class="muted" style="margin-top:6px">' + esc(r.produto) + '</p></div>';
+      if (rec.length > 1 || r.volumes.length > 1) {
+        html += '<section class="card"><h2><span class="qnum">' + (++q) + '</span>Qual volume você está conferindo?</h2><div class="seg">' + rec.map(function (v) {
+          return '<button type="button" class="segb' + (d.vol === v.n ? ' on' : '') + '" data-act="vol" data-n="' + v.n + '" aria-pressed="' + (d.vol === v.n) + '">Volume ' + v.n + ' de ' + r.volumes.length + '</button>';
+        }).join('') + '</div>' + (rec.length < r.volumes.length ? '<p class="hint">Os volumes que ainda não chegaram são conferidos depois.</p>' : '') + '</section>';
+      }
+      html += '<section class="card"><h2><span class="qnum">' + (++q) + '</span>Como o produto chegou?</h2><div class="big2">' +
+        '<button type="button" class="bigc ok' + (d.estado === 'ok' ? ' on' : '') + '" data-act="estado" data-e="ok" aria-pressed="' + (d.estado === 'ok') + '">' + icon('checkc') + 'Em bom estado<small>Volta para o estoque</small></button>' +
+        '<button type="button" class="bigc bad' + (d.estado === 'problema' ? ' on' : '') + '" data-act="estado" data-e="problema" aria-pressed="' + (d.estado === 'problema') + '">' + icon('warn') + 'Com problema<small>Vai para disputa</small></button></div>';
+      if (d.estado === 'problema') {
+        html += '<p class="lbl" style="margin:4px 0 0">Qual é o problema?</p><div class="choices" role="radiogroup" aria-label="Qual é o problema">' + PROBLEMAS.map(function (k) {
+          return '<label class="choice"><input type="radio" name="cond" value="' + k + '"' + (d.cond === k ? ' checked' : '') + '><span>' + COND[k] + '</span></label>';
+        }).join('') + '</div>';
+      }
+      html += '</section>';
+      var need = d.estado === 'problema';
+      html += '<section class="card"><div class="card-h"><h2><span class="qnum">' + (++q) + '</span>Fotos' + (need ? '' : ' <span class="muted" style="font-weight:500">(opcional)</span>') + '</h2><span class="muted" id="phCount">' + plural(d.fotos.length, 'foto', 'fotos') + '</span></div>' +
+        (need ? '<p class="hint">Fotografe o defeito de perto e o produto inteiro. Quanto mais fotos, mais chance de ganhar a disputa.</p>' : '') +
+        '<div class="photos" id="photos">' + photosEdit() + '</div></section>';
+      html += '<section class="card"><h2><label for="obs"><span class="qnum">' + (++q) + '</span>Observação <span class="muted" style="font-weight:500">(opcional)</span></label></h2><textarea id="obs" rows="3" placeholder="Ex.: porta rachada, quina quebrada">' + esc(d.obs) + '</textarea></section>';
+      html += '<p class="err" id="inspErr" role="alert" hidden></p>';
+      html += '<div class="sticky-actions"><button type="button" class="btn btn-primary btn-lg w100" data-act="saveInsp">' + icon('check') + ' Salvar conferência</button></div>';
+      return html + '</div>';
+    }
+    function refreshPhotos() { $('#photos').innerHTML = photosEdit(); $('#phCount').textContent = plural(S.draft.fotos.length, 'foto', 'fotos'); var e = $('#inspErr'); if (e) e.hidden = true; }
+    function startInsp(id, vol) {
+      var r = byId(id); if (!r) return;
+      var rec = r.volumes.filter(function (v) { return v.recebidoEm; });
+      S.draft = {
+        id: id, estado: r.condicao ? (r.condicao === 'ok' ? 'ok' : 'problema') : null, cond: r.condicao && r.condicao !== 'ok' ? r.condicao : null, obs: r.obs, fotos: r.fotos.slice(),
+        vol: vol || (rec.length ? rec[rec.length - 1].n : 1), from: S.view
+      };
+      S.id = id; go('insp');
+    }
+    function saveInsp() {
+      var d = S.draft, r = byId(d.id), err = $('#inspErr');
+      var fail = function (m) { err.textContent = m; err.hidden = false; err.scrollIntoView({ block: 'center' }); };
+      if (!d.estado) return fail('Escolha como o produto chegou: em bom estado ou com problema.');
+      if (d.estado === 'problema' && !d.cond) return fail('Escolha qual é o problema.');
+      if (d.estado === 'problema' && !d.fotos.length) return fail('Tire pelo menos 1 foto. Ela é a prova da disputa.');
+      r.condicao = d.estado === 'ok' ? 'ok' : d.cond; r.obs = d.obs.trim(); r.fotos = d.fotos.slice(); r.inspecionadaEm = Date.now();
+      r.timeline.push({ t: Date.now(), txt: 'Conferido: ' + COND[r.condicao] + (r.fotos.length ? ' · ' + plural(r.fotos.length, 'foto', 'fotos') : ''), por: VOCE });
+      var from = d.from; S.draft = null;
+      if (from === 'receber') { S.scan = null; go('receber'); toast('Conferência salva. Pode bipar o próximo pacote.'); }
+      else { S.id = r.id; go('ficha'); toast(r.condicao === 'ok' ? 'Conferência salva.' : 'Conferência salva. Agora é só abrir a disputa.'); }
+    }
+
+    /* ---------- Receber ---------- */
+    var CAM_ORDER = ['DV-1052', 'DV-1049', 'DV-1050', 'DV-1051', 'DV-1047'];
+    function pendingVols() {
+      var out = [];
+      DB.forEach(function (r) {
+        var k = status(r).k;
+        if (k !== 'aguardando' && k !== 'parcial') return;
+        r.volumes.forEach(function (v) { if (!v.recebidoEm) out.push({ r: r, v: v }); });
+      });
+      out.sort(function (a, b) {
+        var ia = CAM_ORDER.indexOf(a.r.id), ib = CAM_ORDER.indexOf(b.r.id);
+        return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.v.n - b.v.n;
+      });
+      return out;
+    }
+    function scanResultHtml() {
+      var sc = S.scan; if (!sc) return '';
+      if (sc.tipo === 'nf') {
+        return '<div class="result res-bad" role="alert"><div class="res-h">' + icon('x') + '<span>Código não encontrado</span><span class="mono">' + esc(sc.codigo) + '</span></div>' +
+          '<p>Nenhuma devolução tem esse código. Procure pelo número do pedido que está na nota ou na etiqueta:</p>' +
+          '<form id="pedForm" class="inrow" autocomplete="off"><label class="vh" for="pedIn">Número do pedido</label><input type="text" id="pedIn" placeholder="Nº do pedido"><button class="btn" type="submit">Procurar</button></form>' +
+          '<p class="hint">Não achou? Registre o pacote e a gestão vincula depois.</p>' +
+          '<div class="res-btns"><button type="button" class="btn" data-act="naoId">Registrar como não identificado</button></div></div>';
+      }
+      var r = byId(sc.id), v = r.volumes[sc.vol - 1], n = r.volumes.length;
+      var head = '<p class="res-prod">' + esc(r.produto) + '</p><p class="sub">' + PLAT[r.plat].nome + ' · Pedido ' + esc(r.pedido) + '</p>';
+      if (sc.tipo === 'dup') {
+        return '<div class="result res-warn" role="alert"><div class="res-h">' + icon('warn') + '<span>Este volume já foi recebido</span><span class="mono">' + esc(sc.codigo) + '</span></div>' + head +
+          '<p class="res-vol">Volume ' + v.n + ' de ' + n + ' · recebido ' + quando(v.recebidoEm) + ' por ' + esc(v.por) + '</p><p class="hint">Nada foi registrado de novo.</p>' +
+          '<div class="res-btns"><button type="button" class="btn btn-primary" data-act="nextScan">' + icon('scan') + ' Bipar outro pacote</button><button type="button" class="btn" data-act="open" data-id="' + r.id + '">Ver devolução</button></div></div>';
+      }
+      if (sc.tipo === 'confirm') {
+        var st = r.statusPlat === 'recusada' ? 'foi recusada' : 'ainda está em análise';
+        return '<div class="result res-warn" role="alert"><div class="res-h">' + icon('warn') + '<span>Atenção: esta devolução ' + st + '</span><span class="mono">' + esc(sc.codigo) + '</span></div>' + head +
+          '<p>O pacote chegou, mas a plataforma não aprovou a devolução. Registrar a chegada mesmo assim?</p>' +
+          '<div class="res-btns"><button type="button" class="btn btn-primary" data-act="forceRecv">Sim, registrar chegada</button><button type="button" class="btn" data-act="nextScan">Não, cancelar</button></div></div>';
+      }
+      var faltam = r.volumes.filter(function (x) { return !x.recebidoEm; }).length;
+      return '<div class="result res-ok" role="status"><div class="res-h">' + icon('checkc') + '<span>Chegada registrada</span><span class="mono">' + esc(sc.codigo) + '</span></div>' + head +
+        '<p class="res-vol">Volume ' + v.n + ' de ' + n + (faltam ? ' · ' + (faltam === 1 ? 'ainda falta 1 volume' : 'ainda faltam ' + faltam + ' volumes') : ' · todos os volumes chegaram') + '</p>' +
+        '<div class="res-btns"><button type="button" class="btn btn-primary btn-lg" data-act="gotoInsp" data-id="' + r.id + '" data-vol="' + v.n + '">' + icon('camera') + ' Conferir e fotografar agora</button><button type="button" class="btn btn-lg" data-act="nextScan">' + icon('scan') + ' Bipar outro pacote</button></div></div>';
+    }
+    function vReceber() {
+      var pend = pendingVols();
+      var tests = pend.slice(0, 5).map(function (x) { return [x.v.codigo, x.r.produto + ' · vol ' + x.v.n + '/' + x.r.volumes.length]; });
+      var dupR = DB.filter(function (r) { return status(r).k === 'recebida'; })[0];
+      if (dupR) tests.push([dupR.volumes[0].codigo, 'já recebido']);
+      var recR = byId('DV-1035'); if (recR && !recR.volumes[0].recebidoEm) tests.push([recR.volumes[0].codigo, 'devolução recusada']);
+      tests.push(['BR26999901', 'código desconhecido']);
+      var hoje = [];
+      DB.forEach(function (r) { r.volumes.forEach(function (v) { if (v.recebidoEm && daysSince(v.recebidoEm) === 0) hoje.push({ r: r, v: v }); }); });
+      hoje.sort(function (a, b) { return b.v.recebidoEm - a.v.recebidoEm; });
+
+      var html = '<div class="view"><div class="page-h"><div><h1>Receber pacote</h1><p class="muted" style="margin-top:4px">Chegou uma devolução? Leia a etiqueta para registrar a chegada.</p></div></div>';
+      html += '<div class="recv"><div class="recv-main">';
+      if (S.scan) html += '<div id="scanResult">' + scanResultHtml() + '</div>';
+      html += '<section class="card">';
+      html += '<div class="viewfinder' + (S.scanning ? ' scanning' : '') + '"><div class="vf-label" aria-hidden="true"><div class="vf-bars"></div><div class="vf-num"></div></div><span class="vf-frame"></span><span class="vf-line"></span><span class="vf-txt">' + (S.scanning ? 'Lendo etiqueta…' : 'Aponte para o código de barras') + '</span></div>';
+      html += '<button type="button" class="btn btn-primary btn-lg w100" data-act="camSim"' + (S.scanning ? ' disabled' : '') + '>' + icon('scan') + ' Ler etiqueta com a câmera</button>';
+      html += '<p class="hint">Na demonstração, a leitura pela câmera é simulada.</p>';
+      html += '<form id="scanForm" autocomplete="off"><label class="lbl" for="scanIn">Ou use o leitor de código de barras / digite o código</label><div class="inrow code"><input type="text" id="scanIn" placeholder="BR26…" autocapitalize="characters" spellcheck="false"><button class="btn" type="submit">Registrar</button></div></form>';
+      html += '</section></div><aside class="recv-side">';
+      html += '<section class="card"><div class="card-h"><h2>Chegaram hoje</h2><span class="hint">' + plural(pend.length, 'volume a caminho', 'volumes a caminho') + '</span></div>' + (hoje.length ? '<ul class="today">' + hoje.map(function (x) {
+        return '<li><span>' + esc(x.r.produto) + ' <span class="muted">· vol ' + x.v.n + '/' + x.r.volumes.length + '</span></span><span class="muted">' + hhmm(x.v.recebidoEm) + '</span></li>';
+      }).join('') + '</ul>' : '<p class="muted">Nenhum pacote recebido hoje ainda.</p>') + '</section>';
+      html += '<section class="card"><details class="tests"' + (wide() ? ' open' : '') + '><summary>Códigos para testar a demonstração</summary><div class="codes">' + tests.map(function (t) {
+        return '<button type="button" class="code-b" data-act="test" data-code="' + t[0] + '"><span class="mono">' + t[0] + '</span><small>' + esc(t[1]) + '</small></button>';
+      }).join('') + '</div></details></section>';
+      html += '</aside></div></div>';
+      return html;
+    }
+    function receber(r, v) {
+      v.recebidoEm = Date.now(); v.por = VOCE;
+      r.timeline.push({ t: Date.now(), txt: 'Volume ' + v.n + ' de ' + r.volumes.length + ' chegou (bipado)', por: VOCE });
+      S.done.scan = true;
+    }
+    function processCode(code) {
+      code = String(code || '').trim().toUpperCase().replace(/\s+/g, '');
+      if (!code) return;
+      var hit = null;
+      DB.forEach(function (r) { r.volumes.forEach(function (v) { if (v.codigo === code) hit = { r: r, v: v }; }); });
+      if (!hit) { S.scan = { tipo: 'nf', codigo: code }; beep(false); }
+      else if (hit.v.recebidoEm) { S.scan = { tipo: 'dup', id: hit.r.id, vol: hit.v.n, codigo: code }; beep(false); }
+      else if (hit.r.statusPlat !== 'aprovada') { S.scan = { tipo: 'confirm', id: hit.r.id, vol: hit.v.n, codigo: code }; beep(false); }
+      else { receber(hit.r, hit.v); S.scan = { tipo: 'ok', id: hit.r.id, vol: hit.v.n, codigo: code }; beep(true); }
+      render(); window.scrollTo(0, 0);
+    }
+    function camSim() {
+      var p = pendingVols();
+      if (!p.length) { toast('Não há pacotes a caminho.'); return; }
+      S.scanning = true; S.scan = null; render();
+      setTimeout(function () { S.scanning = false; processCode(p[0].v.codigo); }, 1300);
+    }
+
+    /* ---------- sound + toast ---------- */
+    var actx = null;
+    function beep(ok) {
+      try {
+        actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+        var o = actx.createOscillator(), g = actx.createGain();
+        o.type = 'square'; o.frequency.value = ok ? 1760 : 220; g.gain.value = 0.04;
+        o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + (ok ? 0.12 : 0.3));
+      } catch (e) { /* som opcional */ }
+    }
+    var tTimer;
+    function toast(m) { var el = $('#toast'); el.textContent = m; el.hidden = false; clearTimeout(tTimer); tTimer = setTimeout(function () { el.hidden = true; }, 3800); }
+
+    /* ---------- sync ---------- */
+    function doSync() {
+      if (S.syncing) return;
+      S.syncing = true; if (S.view !== 'painel') go('painel'); else render();
+      setTimeout(function () {
+        S.syncing = false; var msg;
+        if (!S.synced) {
+          newOnes().forEach(function (o) { DB.push(build(o)); });
+          var r = byId('DV-1053');
+          if (r && r.statusPlat === 'analise') { r.statusPlat = 'aprovada'; r.aprovadaEm = Date.now(); r.novo = true; r.timeline.push({ t: Date.now(), txt: 'Aprovada pela plataforma', por: PLATF }); }
+          S.synced = true; msg = 'Pronto: 3 devoluções novas e 1 aprovada desde ontem.';
+        } else msg = 'Tudo em dia. Nenhuma novidade nas plataformas.';
+        S.lastSync = Date.now(); S.done.sync = true; render(); toast(msg);
+      }, 1500);
+    }
+
+    /* ---------- render + routing ---------- */
+    var root = 'painel';
+    function render() {
+      var v = S.view, m = $('#main');
+      m.innerHTML = v === 'painel' ? vPainel() : v === 'lista' ? vLista() : v === 'receber' ? vReceber() : v === 'ficha' ? vFicha() : vInsp();
+      if (v === 'painel') drawChart();
+      var navKey = root;
+      document.querySelectorAll('[data-nav]').forEach(function (b) { var on = b.dataset.nav === navKey; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+      var nT = nTasks(), nPend = pendingVols().length;
+      document.querySelectorAll('[data-badge="painel"]').forEach(function (b) { b.textContent = nT; b.hidden = !nT; });
+      document.querySelectorAll('[data-badge="receber"]').forEach(function (b) { b.textContent = nPend; b.hidden = !nPend; });
+      if (v === 'receber' && !S.scanning && !S.scan && window.matchMedia && matchMedia('(pointer: fine)').matches) { var i = $('#scanIn'); if (i) i.focus({ preventScroll: true }); }
+    }
+    function go(v) {
+      if (v === 'painel' || v === 'lista' || v === 'receber') root = v;
+      S.view = v; S.form = null; S.txtFallback = null; render(); window.scrollTo(0, 0);
+    }
+    function goBack() {
+      S.view = root; S.form = null; S.txtFallback = null; render(); window.scrollTo(0, 0);
+    }
+    function openFicha(id) { S.id = id; S.done.ficha = true; var r = byId(id); if (r) r.novo = false; go('ficha'); }
+
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-act]'); if (!b) return;
+      var a = b.dataset.act, id = b.dataset.id, r, g;
+      switch (a) {
+        case 'nav': if (b.dataset.v === 'receber' && S.view !== 'receber') S.scan = null; go(b.dataset.v); break;
+        case 'back': goBack(); break;
+        case 'open': openFicha(id); break;
+        case 'filter': S.filtro = b.dataset.f; S.q = ''; S.plat = S.view === 'painel' ? S.dplat : ''; if (S.view === 'lista') render(); else go('lista'); break;
+        case 'sync': doSync(); break;
+        case 'per': S.per = +b.dataset.p; render(); break;
+        case 'ttab': S.ttab = b.dataset.t; render(); var tb = document.querySelector('.ttab[data-t="' + S.ttab + '"]'); if (tb) tb.focus(); break;
+        case 'chartTable': S.chartTable = !S.chartTable; render(); break;
+        case 'reset': reset(); go('painel'); toast('Demonstração reiniciada.'); break;
+        case 'g1': doSync(); break;
+        case 'g2': g = tasks(); r = g.disputa[0] || g.conferir[0] || DB[0]; openFicha(r.id); break;
+        case 'g3': S.scan = null; go('receber'); break;
+        case 'g4': g = tasks(); r = g.disputa[0]; if (r) openFicha(r.id); else toast('Nenhuma devolução pronta para disputa agora.'); break;
+        case 'camSim': camSim(); break;
+        case 'test': processCode(b.dataset.code); break;
+        case 'forceRecv': r = byId(S.scan.id); receber(r, r.volumes[S.scan.vol - 1]); S.scan.tipo = 'ok'; beep(true); render(); break;
+        case 'nextScan': S.scan = null; render(); window.scrollTo(0, 0); var si = $('#scanIn'); if (si && matchMedia('(pointer: fine)').matches) si.focus(); break;
+        case 'naoId': S.naoId.push({ codigo: S.scan.codigo, em: Date.now() }); S.scan = null; render(); toast('Pacote registrado. Ele aparece no painel para a gestão vincular.'); break;
+        case 'gotoInsp': startInsp(id, b.dataset.vol ? +b.dataset.vol : null); break;
+        case 'cancelInsp': var from = S.draft && S.draft.from; S.draft = null; if (from === 'receber') go('receber'); else { S.view = 'ficha'; render(); window.scrollTo(0, 0); } break;
+        case 'vol': S.draft.vol = +b.dataset.n; render(); break;
+        case 'estado': S.draft.estado = b.dataset.e; if (b.dataset.e === 'ok') S.draft.cond = null; render(); var er = $('#inspErr'); if (er) er.hidden = true; break;
+        case 'exFoto': S.draft.fotos.push({ ex: true, seed: Math.floor(Math.random() * 1e6), vol: S.draft.vol }); refreshPhotos(); break;
+        case 'rmFoto': S.draft.fotos.splice(+b.dataset.i, 1); refreshPhotos(); break;
+        case 'saveInsp': saveInsp(); break;
+        case 'res': S.form = S.form === b.dataset.r ? null : b.dataset.r; render(); var fi = document.querySelector('#resForm input'); if (fi) fi.focus(); break;
+        case 'estoque':
+          r = byId(id); r.estoque = true; r.encerradaEm = Date.now();
+          r.timeline.push({ t: Date.now(), txt: 'Voltou ao estoque · devolução encerrada', por: VOCE }); render(); toast('Devolução encerrada. Produto de volta ao estoque.'); break;
+        case 'zip':
+          r = byId(id); toast('No sistema de verdade, baixa as ' + r.fotos.length + ' fotos de uma vez (' + r.id + '-fotos.zip).'); break;
+        case 'copyTxt':
+          r = byId(id);
+          var txt = dispText(r);
+          var fail = function () { S.txtFallback = id; render(); var t = $('#txtFb'); if (t) { t.focus(); t.select(); } toast('Selecione e copie o texto que apareceu.'); };
+          try { navigator.clipboard.writeText(txt).then(function () { toast('Texto copiado. É só colar no site da plataforma.'); }, fail); } catch (err) { fail(); }
+          break;
+      }
+    });
+
+    document.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var f = e.target, r;
+      if (f.id === 'scanForm') { var i = $('#scanIn'); var c = i.value; i.value = ''; processCode(c); }
+      else if (f.id === 'pedForm') {
+        var q = $('#pedIn').value.trim().replace('#', '');
+        var hit = q && DB.filter(function (x) { return x.pedido.replace('#', '').indexOf(q) >= 0; })[0];
+        if (hit) { S.scan = null; openFicha(hit.id); } else toast('Nenhum pedido encontrado com esse número.');
+      }
+      else if (f.id === 'dispForm') {
+        r = byId(S.id);
+        var inp = $('#fProt'), prot = inp.value.trim();
+        if (!prot) { inp.focus(); toast('Digite o número do protocolo que a plataforma mostrou.'); return; }
+        r.disputa = { abertaEm: Date.now(), protocolo: prot, valor: r.valor, resultado: null, valorRecebido: 0, motivoPerda: '', fechadaEm: null };
+        r.timeline.push({ t: Date.now(), txt: 'Disputa aberta · protocolo ' + prot, por: VOCE });
+        S.form = null; S.txtFallback = null; S.done.disp = true; render(); window.scrollTo(0, 0); toast('Disputa registrada. Agora é aguardar a resposta da plataforma.');
+      }
+      else if (f.id === 'resForm') {
+        r = byId(S.id);
+        var res = f.dataset.r, D = r.disputa;
+        D.resultado = res; D.fechadaEm = Date.now();
+        if (res === 'ganha') { D.valorRecebido = parseValor($('#fRec').value) || D.valor; r.timeline.push({ t: Date.now(), txt: 'Disputa ganha · reembolso de ' + money(D.valorRecebido), por: VOCE }); }
+        else { D.motivoPerda = $('#fMot').value.trim() || 'Motivo não informado'; r.timeline.push({ t: Date.now(), txt: 'Disputa perdida · ' + D.motivoPerda, por: VOCE }); }
+        S.form = null; render(); toast(res === 'ganha' ? 'Reembolso registrado.' : 'Resultado registrado.');
+      }
+    });
+
+    document.addEventListener('input', function (e) {
+      var t = e.target;
+      if (t.id === 'q') { S.q = t.value; $('#rows').innerHTML = rowsHtml(); }
+      else if (t.id === 'obs' && S.draft) S.draft.obs = t.value;
+    });
+    document.addEventListener('change', function (e) {
+      var t = e.target;
+      if (t.id === 'dplat') { S.dplat = t.value; S.ttab = null; render(); return; }
+      if (t.id === 'pf') { S.plat = t.value; $('#rows').innerHTML = rowsHtml(); }
+      else if (t.name === 'cond' && S.draft) { S.draft.cond = t.value; var er = $('#inspErr'); if (er) er.hidden = true; }
+      else if (t.id === 'fileIn' && S.draft) {
+        Array.prototype.forEach.call(t.files || [], function (file) { S.draft.fotos.push({ src: URL.createObjectURL(file), vol: S.draft.vol }); });
+        refreshPhotos();
+      }
+    });
+    document.addEventListener('toggle', function (e) { if (e.target.id === 'guide') S.guideOpen = e.target.open; }, true);
+
+    var rzT;
+    window.addEventListener('resize', function () { clearTimeout(rzT); rzT = setTimeout(function () { if (S.view === 'painel' && !S.chartTable) drawChart(); }, 150); });
+
+    document.querySelectorAll('[data-ic]').forEach(function (el) { el.insertAdjacentHTML('afterbegin', icon(el.dataset.ic)); });
+    reset();
+    render();
+  })();
+</script>
