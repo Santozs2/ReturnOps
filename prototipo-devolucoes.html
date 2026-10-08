@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
-  /* Recupera · "soft dashboard": black & white: framed app on a light-grey plane, black sidebar pill, white cards, one black hero; blue is reserved for things you can click.
+  /* Recupera · "soft dashboard": black & white: framed app on a light-grey plane, black sidebar pill, white cards, one black hero; violet is reserved for things you can click.
      Light-first (opens light even on dark phones); an explicit dark choice in the viewer still applies. */
   :root {
     --bg: #E9E9E9;
@@ -13,9 +13,9 @@
     --ink: #0A0A0A;
     --muted: #6B6B6B;
     --line: #E4E4E4;
-    --accent: #2457E6;
-    --accent-2: #1A43BF;
-    --accent-soft: #EBF0FF;
+    --accent: #6A3DE8;
+    --accent-2: #5228C9;
+    --accent-soft: #F1ECFF;
     --accent-ink: #FFFFFF;
     --side-1: #1A1A1A;
     --side-2: #000000;
@@ -27,7 +27,7 @@
     --bad: #D42F45; --bad-soft: #FCE9EC;
     --info: #555555; --info-soft: #EFEFEF;
     --p-ml: #eda100; --p-sh: #eb6834; --p-tt: #1baf7a; --p-lj: #2a78d6;
-    --scan: #0A0A0A; --scan-line: #4D7CFF;
+    --scan: #0A0A0A; --scan-line: #9B7BFF;
     --shadow-sm: 0 10px 28px -18px rgba(0, 0, 0, .22);
     --shadow-lg: 0 26px 44px -26px rgba(0, 0, 0, .45);
     --r-lg: 24px; --r-md: 18px; --r-sm: 12px;
@@ -37,7 +37,7 @@
   }
   :root[data-theme="dark"] {
     --bg: #000000; --frame: #0B0B0B; --surface: #151515; --surface-2: #1D1D1D; --ink: #F2F2F2; --muted: #A3A3A3; --line: #2A2A2A;
-    --accent: #5B85FF; --accent-2: #3A63E0; --accent-soft: #18233F; --accent-ink: #FFFFFF; --side-1: #1C1C1C; --side-2: #0F0F0F;
+    --accent: #8B6AF5; --accent-2: #6C47E6; --accent-soft: #221A3D; --accent-ink: #FFFFFF; --side-1: #1C1C1C; --side-2: #0F0F0F;
     --hero-1: #2A2A2A; --hero-2: #121212; --mono-tile: #2A2A2A;
     --ok: #4ADE80; --ok-soft: #12301E; --warn: #F2B84B; --warn-soft: #33290F; --bad: #FF7A86; --bad-soft: #3A1A20; --info: #B5B5B5; --info-soft: #242424;
     --p-ml: #c98500; --p-sh: #d95926; --p-tt: #199e70; --p-lj: #3987e5;
@@ -96,7 +96,7 @@
   .card-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-sm); padding: 8px 16px; font-weight: 700; cursor: pointer; min-height: 44px; text-align: center; transition: transform .12s, border-color .12s, color .12s; }
   .btn:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; color: var(--accent-ink); box-shadow: 0 12px 22px -12px rgba(36, 87, 230, .85); }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-color: transparent; color: var(--accent-ink); box-shadow: 0 12px 22px -12px rgba(106, 61, 232, .85); }
   .btn-primary:hover { color: var(--accent-ink); border-color: transparent; transform: translateY(-1px); }
   .btn.on { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
   .btn:disabled { opacity: .65; cursor: progress; transform: none; }
@@ -253,7 +253,7 @@
   .rp-h h2 .ic { color: var(--ink); }
   .segtog { display: grid; grid-template-columns: 1fr 1fr; background: var(--surface-2); border-radius: 14px; padding: 4px; gap: 4px; }
   .segtog button { border: 0; background: none; border-radius: 10px; padding: 8px; font-weight: 700; font-size: .84rem; color: var(--muted); cursor: pointer; min-height: 38px; }
-  .segtog button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 8px 16px -10px rgba(36, 87, 230, .9); }
+  .segtog button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 8px 16px -10px rgba(106, 61, 232, .9); }
   .feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
   .fitem { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 8px 6px; border: 0; background: none; border-radius: 14px; cursor: pointer; text-align: left; }
   .fitem:hover { background: var(--surface-2); }
